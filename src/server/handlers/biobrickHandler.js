@@ -1,0 +1,8 @@
+/**
+ * Handles requests for biobricks
+ */
+
+const express = require('express');
+const router = express.Router();
+
+module.exports = router;
