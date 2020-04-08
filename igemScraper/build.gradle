@@ -10,7 +10,8 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-//    maven { url 'https://jitpack.io' }
+    jcenter()
+    maven { url 'https://jitpack.io' }
 }
 
 compileTestKotlin {
@@ -25,9 +26,9 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     // skrape.it
-    implementation("it.skrape:skrapeit-core:1.0.0-alpha6")
-//    implementation 'com.github.cvb941:skrape.it:-SNAPSHOT'
-//    implementation project(':skrapeit-core')
+//    implementation("it.skrape:skrapeit-core:1.0.0-alpha6")
+//    implementation 'com.github.skrapeit:skrape.it:53f821e585'
+    implementation 'com.github.cvb941:skrape.it:378ac23d09'
 
     // https://mvnrepository.com/artifact/com.opencsv/opencsv
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.1'

@@ -2,6 +2,7 @@ package igemteam
 
 import com.opencsv.bean.CsvBindByName
 import com.opencsv.bean.CsvToBeanBuilder
+import it.skrape.core.fetcher.Mode
 import it.skrape.core.htmlDocument
 import it.skrape.extract
 import it.skrape.matchers.toBe
@@ -29,6 +30,7 @@ object IgemTeamScraper {
     }
 
     fun parseTeamPage(team: IgemTeam) = skrape {
+        this.mode = Mode.DOM
         this.url = team.url ?: throw IllegalStateException("Cannot get team url. Check if team id is successfully parsed.")
         this.sslRelaxed = true
 
