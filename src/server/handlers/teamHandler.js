@@ -6,6 +6,7 @@ const express = require('express');
 const router = express.Router();
 const codes = require('../server_codes');
 const elasticSearch = require('elasticsearch');
+const buildQuery = require('./query_builder');
 
 let client = new elasticSearch.Client({
     host : 'https://elasticsearch.kusik.net',
@@ -53,29 +54,11 @@ router.get('/', (request, response, next) => {
 });
 
 router.get('/match', (request, response, next) => {
-    let query_obj, must, must_not;
-
-    for (var prop in request.body) {
-
-        if (Object.prototype.hasOwnProperty.call(request.body, prop)) {
-            if (Array.isArray(prop)) {
-                //for(el of prop);
-            } else {
-
-            }
-        }
-    }
-
-    query_obj = request.body;
-
     client.search({
         index: indexString,
         scroll: '20s',
         body: {
-            query: {
-                //match : request.body
-                ...query_obj
-            }
+            query: buildQuery(request.body)
         }
     }, (err, res) => {
         if(err) {
