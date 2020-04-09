@@ -22,7 +22,7 @@ api.use((request, response, next) => {
     response.header('Access-Control-Allow-Headers', '*');
 
     next();
-})
+});
 
 api.use('/teams', teamHandler);
 api.use('/biobricks', biobricksHandler);
