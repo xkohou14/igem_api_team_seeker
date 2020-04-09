@@ -1,3 +1,5 @@
+import com.github.kittinunf.fuel.core.extensions.jsonBody
+import com.github.kittinunf.fuel.httpPost
 import igemteam.IgemTeamScraper
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.Json
@@ -11,10 +13,16 @@ fun main() {
 
     println(teams[0].url)
 
-    val parsedTeam = IgemTeamScraper.parseTeamPage(teams[0])
-    println(parsedTeam)
+    val parsedTeams = teams.asSequence().take(5).map {
+        IgemTeamScraper.parseTeamPage(it)
+    }.forEach {
+        val parsedTeamJson = Json(JsonConfiguration.Stable).stringify(it)
+        println(parsedTeamJson)
 
+        // Send to node
+        "http://localhost:3001/teams".httpPost().jsonBody(parsedTeamJson)
+            .also { println(it) }
+            .response { result -> }
+    }
 
-    val parsedTeamJson = Json(JsonConfiguration.Stable).stringify(parsedTeam)
-    println(parsedTeamJson)
 }
