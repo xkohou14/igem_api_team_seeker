@@ -1,5 +1,6 @@
 package igemteam
 
+@kotlinx.serialization.Serializable
 class IgemUser {
     var userId: Int? = null
 

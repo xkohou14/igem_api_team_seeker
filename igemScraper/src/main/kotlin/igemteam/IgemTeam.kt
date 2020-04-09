@@ -2,6 +2,7 @@ package igemteam
 
 import com.opencsv.bean.CsvBindByName
 
+@kotlinx.serialization.Serializable
 open class IgemTeam {
     @CsvBindByName(column = "Team ID ")
     var teamId: Int? = null
@@ -29,6 +30,23 @@ open class IgemTeam {
 
     @CsvBindByName(column = " Year")
     var year: String? = null
+
+    var kind: String? = null
+    var teamCode: String? = null
+    var division: String? = null
+
+    var schoolAddress: String? = null
+
+    var title: String? = null
+    var abstract: String? = null
+
+    var primaryPi: IgemUser? = null
+    var secondaryPi: IgemUser? = null
+
+    var instructors: List<IgemUser> = emptyList()
+    var studentLeaders: List<IgemUser> = emptyList()
+    var studentMembers: List<IgemUser> = emptyList()
+    var advisors: List<IgemUser> = emptyList()
 
     val url get() = teamId?.let { "https://igem.org/Team.cgi?team_id=$it" }
 }

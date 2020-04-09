@@ -30,6 +30,9 @@ object IgemTeamScraper {
         return teams
     }
 
+    /**
+     *  Fills detailed information to the team object from the team page
+     */
     fun parseTeamPage(team: IgemTeam) = skrape {
         this.mode = Mode.DOM
         this.url =
@@ -38,14 +41,12 @@ object IgemTeamScraper {
 
         extract {
             htmlDocument {
-                val tables = findAll("tbody")
-
                 val infoTable = findFirst("#table_info")
                 val infoRows = infoTable.findAll("tr")
 
                 val titleAbstractTable = findFirst("#table_abstract")
 
-                IgemTeamDetail().apply {
+                team.apply {
                     kind = infoRows[3].allElements[2].text
                     teamCode = infoRows[1].allElements[2].text
                     division = infoRows[4].allElements[2].text
@@ -54,7 +55,9 @@ object IgemTeamScraper {
 
                     title = titleAbstractTable.findFirst("td").text
                     abstract = titleAbstractTable.findAll("tr")[1].text
-//
+
+//TODO parse team people
+
 //                    primaryPi =
 //                    secondaryPi =
 //
