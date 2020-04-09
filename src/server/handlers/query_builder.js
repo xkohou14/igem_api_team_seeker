@@ -9,6 +9,9 @@
  *
  * {
  *     NAME:[{contain: Bool, value: String}]
+ *     .
+ *     .
+ *     .
  * }
  *
  * For:

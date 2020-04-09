@@ -10,8 +10,101 @@ Project for subject WAP.
 ## Installation
 
 ### `npm install`
-### `npm install nodemon --save-dev`
 
+##API
+There are 2 kinds of records:
+- team
+- biobricks
+
+Information about teams is extracted from: https://igem.org/Team_List.
+
+Biobricks information is extracted from: 
+
+http://parts.igem.org/Frequently_Used_Parts
+http://parts.igem.org/Promoters/Catalog/Constitutive
+http://parts.igem.org/Promoters/Catalog/Cell_signalling
+http://parts.igem.org/Promoters/Catalog/Metal_sensitive
+http://parts.igem.org/Promoters/Catalog/Phage
+http://parts.igem.org/Promoters/Catalog/Madras
+http://parts.igem.org/Promoters/Catalog/USTC
+http://parts.igem.org/Primers/Catalog
+http://parts.igem.org/cgi/partsdb/pgroup.cgi?pgroup=Composite
+http://parts.igem.org/cgi/partsdb/pgroup.cgi?pgroup=Plasmid
+http://parts.igem.org/cgi/partsdb/pgroup.cgi?pgroup=Plasmid_Backbone
+http://parts.igem.org/cgi/partsdb/pgroup.cgi?pgroup=dna
+http://parts.igem.org/cgi/partsdb/pgroup.cgi?pgroup=Coding
+http://parts.igem.org/cgi/partsdb/pgroup.cgi?pgroup=Tag
+http://parts.igem.org/cgi/partsdb/pgroup.cgi?pgroup=RBS
+http://parts.igem.org/cgi/partsdb/pgroup.cgi?pgroup=Regulatory
+
+
+Api support following requests
+####GET
+- `localhost:3001/teams`
+
+ returns all teams registered in iGEM.
+ 
+ - `localhost:3001/biobricks`
+ 
+  returns all biobricks registered in iGEM.
+ 
+ - `localhost:3001/teams/match`
+ - `localhost:3001/biobricks/match`
+ 
+ return teams (or biobricks) which are sufficient for query. Query is formed in request body:
+ 
+```
+{
+    NAME:[{contain: Bool, value: String}]
+    .
+    .
+    .
+}
+```
+where NAME is name of label (attribute to search)
+     contain is a flag if it is must be found in textfield or not. Team data structure is following...
+```     
+{
+  "teamId": String,
+  "name": String,
+  "region": String,
+  "country": String,
+  "track": String,
+  "section": String,
+  "size": Number,
+  "status": Number,
+  "year": Number,
+  "kind": String,
+  "teamCode": Number,
+  "division": String,
+  "schoolAddress": String,
+  "title": String,
+  "abstract": String,
+  "primaryPi": String,
+  "secondaryPi": String,
+  "instructors": [String],
+  "studentLeaders": [String],
+  "studentMembers": [String],
+  "advisors": [String]
+}
+```
+
+     
+This example will return all teams registered in 2020 which name contains "team" but doesn't contain "2".
+```
+GET: localhost:3001/teams/match
+{
+    "name":[{"contain":false, "value": "2"}, {"contain":true, "value": "team"}],
+    "year":[{"contain":true, "value": "2020"}]
+}
+```
+####POST
+- `localhost:3001/teams`
+- `localhost:3001/biobricks`
+
+With body attributes like in structure description above.
+
+--------------------------------------------
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -24,6 +117,15 @@ Runs the app in the development mode.<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br />
+You will also see any lint errors in the console.
+
+### `npm server`
+
+Runs the server in the development mode <br />
+at [http://localhost:3001](http://localhost:3001).
+Uses `nodemon`
+
+The server will restart if you make edits.<br />
 You will also see any lint errors in the console.
 
 ### `npm test`
