@@ -6,6 +6,7 @@ import it.skrape.core.fetcher.Mode
 import it.skrape.core.htmlDocument
 import it.skrape.extract
 import it.skrape.matchers.toBe
+import it.skrape.selects.html5.table
 import it.skrape.skrape
 import java.io.InputStreamReader
 import java.net.URL
@@ -31,23 +32,28 @@ object IgemTeamScraper {
 
     fun parseTeamPage(team: IgemTeam) = skrape {
         this.mode = Mode.DOM
-        this.url = team.url ?: throw IllegalStateException("Cannot get team url. Check if team id is successfully parsed.")
+        this.url =
+            team.url ?: throw IllegalStateException("Cannot get team url. Check if team id is successfully parsed.")
         this.sslRelaxed = true
 
         extract {
             htmlDocument {
-                val infoTable = findFirst("tbody")
-                val infoRows = infoTable.findAll("*")
+                val tables = findAll("tbody")
+
+                val infoTable = findFirst("#table_info")
+                val infoRows = infoTable.findAll("tr")
+
+                val titleAbstractTable = findFirst("#table_abstract")
 
                 IgemTeamDetail().apply {
-                    kind = infoRows[3].findAll("td")[1].text
-//                    teamCode =
-//                    division =
-//
-//                    schoolAddress =
-//
-//                    title =
-//                    abstract =
+                    kind = infoRows[3].allElements[2].text
+                    teamCode = infoRows[1].allElements[2].text
+                    division = infoRows[4].allElements[2].text
+
+                    schoolAddress = infoRows[2].allElements[2].text
+
+                    title = titleAbstractTable.findFirst("td").text
+                    abstract = titleAbstractTable.findAll("tr")[1].text
 //
 //                    primaryPi =
 //                    secondaryPi =
@@ -56,15 +62,6 @@ object IgemTeamScraper {
 //                    studentLeaders =
 //                    studentMembers =
 //                    advisors =
-
-//                    title = findFirst("[itemprop=headline]").text,
-//                    symbol = findFirstOrNull("[sasource=mc_about]")?.attribute("href")
-//                        ?.let { it.substring(1 + it.indexOfLast { it == '/' }) },
-//                    author = findFirst("a[rel=author] [itemprop=name]").text,
-//                    text = findFirst("#bullets_ul").text,
-//                    id = "0",
-//                    date = LocalDateTime.from(dateFormat.parse(findFirst("[itemprop=\"datePublished\"]").attribute("content"))),
-//                    fullArticleUrl = url
                 }
             }
         }
