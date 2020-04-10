@@ -5,90 +5,15 @@
 const express = require('express');
 const router = express.Router();
 const codes = require('../server_codes');
+const elasticSearch = require('elasticsearch');
 const buildQuery = require('./query_builder');
-const shared = require('./shared');
-const checkAuth = require('./auth_checker');
 
-let client = shared.client;
+let client = new elasticSearch.Client({
+    host : 'https://elasticsearch.kusik.net',
+    log: 'trace'
+});
 let indexString = "team";
-let structure = ["teamId",
-    "name",
-    "region",
-    "country",
-    "track",
-    "section",
-    "size",
-    "status",
-    "year",
-    "kind",
-    "teamCode",
-    "division",
-    "schoolAddress",
-    "title",
-    "abstract",
-    "primaryPi",
-    "secondaryPi",
-    "instructors",
-    "studentLeaders",
-    "studentMembers",
-    "advisors"];
 
-/**
- * Checks if tea element with teamCode exists
- * @param teamCode of team
- * @param exists action to do if it's exists
- * @param nonExist action to do if it doesn't exist
- */
-function teamExists (teamCode, exists, nonExist) {
-    client.search({
-        index: indexString,
-        scroll: '1s',
-        body: {
-            query: {
-                bool : {
-                    must : {
-                        match : {
-                            teamCode : teamCode
-                        }
-                    }
-                }
-            }
-        }
-    }, (err, res) => {
-        if(err) {
-            nonExist();
-        } else {
-            let allHits = [];
-            res.hits.hits.forEach((hit) => {
-                if (hit._source.teamCode == teamCode) {
-                    allHits.push({
-                        id: hit._id,
-                        ...hit._source
-                    });
-                }
-            });
-
-            if (allHits.length > 0)  {
-                exists();
-            } else {
-                nonExist();
-            }
-        }
-    });
-}
-
-function containsAttribute (object, attr) {
-    return object.hasOwnProperty(attr);
-}
-
-function checkStructure(object) {
-    for (var el of structure) {
-        if (!containsAttribute(object, el)) {
-            return false;
-        }
-    }
-    return true;
-}
 
 router.get('/', (request, response, next) => {
     client.search({
@@ -129,7 +54,27 @@ router.get('/', (request, response, next) => {
 });
 
 router.get('/structure', (request, response, next) => {
-    response.status(codes.OK).json(structure);
+    client.indices.getMapping({
+        index: indexString
+    }, (err, res) => {
+        if(err) {
+            response.status(codes.NOT_FOUND).json({
+                code : err.status,
+                message : err.message,
+            });
+        } else {
+            console.log("Mappings:\n",JSON.stringify(res, null, 4));
+            let properties = [];
+            let obj = res[indexString]["mappings"]["properties"];
+            for (var prop in obj) {
+                if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                    properties.push(prop);
+                }
+            }
+            console.log("Properties: " + properties);
+            response.status(codes.OK).json(properties);
+        }
+    });
 });
 
 router.post('/match', (request, response, next) => {
@@ -168,15 +113,16 @@ router.post('/match', (request, response, next) => {
     });
 });
 
-router.post('/', checkAuth, (request, response, next) => {
-    if(!checkStructure(request.body)) {
-        return response.status(codes.SERVER_ERROR).json({
-            code : codes.SERVER_ERROR,
-            message : "Object does not contain required structure : " + structure
-        });
-    }
+router.post('/', (request, response, next) => {
+    /*const team = {
+        id : 6,
+        name : request.body.name,
+        year: request.body.year,
+        description: request.body.description,
+        wiki : request.body.wiki
+    };*/
 
-    let nonExist = () => {client.index({
+    client.index({
         index : indexString,
         body : request.body
     }, (err, req, res) => {
@@ -192,71 +138,7 @@ router.post('/', checkAuth, (request, response, next) => {
                 object : request.body
             });
         }
-    });};
-
-    let exist = () => {
-        response.status(codes.UNPROCESSABLE_ENTITY).json({
-            code : codes.UNPROCESSABLE_ENTITY,
-            message : "Team under code " + request.body.teamCode + " already exists"
-        })
-    };
-
-    teamExists(request.body.teamCode, exist, nonExist);
-});
-
-router.delete('/:teamCode', checkAuth, (request, response, next) => {
-    teamExists(request.params.teamCode,
-        () => {
-            client.search({
-                index: indexString,
-                scroll: '1s',
-                body: {
-                    query: buildQuery({
-                        teamCode: [{contain: true, value: request.params.teamCode}]
-                    })
-                }
-            }, (err, res) => {
-                if(err) {
-                    response.status(codes.NOT_FOUND).json({
-                        code : err.status,
-                        message : err.message,
-                    });
-                } else {
-                    let allHits = [];
-                    res.hits.hits.forEach(function (hit) {
-                        allHits.push({
-                            id: hit._id,
-                            ...hit._source
-                        });
-                    });
-
-                    if (allHits.length >= 1) {
-                        client.delete({
-                            index: indexString,
-                            id : allHits[0].id
-                        }, (err, req, res) => {
-                            if(err) {
-                                response.status(codes.SERVER_ERROR).json({
-                                    code : err.status,
-                                    message : err.message
-                                });
-                            } else {
-                                response.status(codes.OK).json({
-                                    message : "Object deleted",
-                                    code : codes.OK
-                                });
-                            }
-                        });
-                    }
-                }
-            });
-        },
-        () => {
-            response.status(codes.UNPROCESSABLE_ENTITY).json({
-                code : codes.UNPROCESSABLE_ENTITY,
-                message : "Team under " + request.params.teamCode + " doesn't exists"
-            })
-        });
+    });
 });
 
 module.exports = router;
