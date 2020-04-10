@@ -43,4 +43,7 @@ dependencies {
     implementation group: "com.github.kittinunf.fuel", name: "fuel", version: "2.2.2"
     implementation group : "com.github.kittinunf.fuel", name: "fuel-coroutines", version: "2.2.2"
     implementation group : "com.github.kittinunf.fuel", name: "fuel-kotlinx-serialization", version: "2.2.2"
+
+    // Crawler4j
+    implementation group: 'edu.uci.ics', name: 'crawler4j', version: '4.4.0'
 }
