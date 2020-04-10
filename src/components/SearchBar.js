@@ -5,12 +5,25 @@ class SearchBar extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            search: ''
-        }
+            search: '',
+            biobricks : false
+        };
+
+        this.master = props.master;
+        this.teams = props.team_struture;
+        this.biobricks = props.biobricks_struture;
+
+        this.handleOnClick = this.handleOnClick.bind(this);
     }
 
-    handleOnClick() {
-        console.log("clicked")
+    handleOnClick(e) {
+        e.preventDefault();
+        console.log("clicked search button " + this.state.search);
+        this.master.clickMaster();
+    }
+
+    formQuery() {
+
     }
 
     onInputChange(event) {
@@ -22,8 +35,8 @@ class SearchBar extends Component {
 
     render() {
         const filteredTeams = this.props.items
-            .filter( item => item.title.toLowerCase().includes(this.state.search.toLowerCase())
-        );
+            //.filter( item => item.title.toLowerCase().includes(this.state.search.toLowerCase())
+       // );
 
         // This function maps TeamItem Component to every search result object
         const teamComponents = filteredTeams.map(item => {
@@ -31,7 +44,26 @@ class SearchBar extends Component {
                     <TeamItem key={item.id} item={item}/>
                 )
             }
-        )
+        );
+
+        //if (this.state.biobricks) {
+        const biobricks = this.biobricks.map(el => {
+                return (
+                    <div className="selectName">
+                        <label>{el} : </label> <input type="checkbox" name={el} checked={true}/>
+                    </div>
+                )
+            })
+        //} else {
+        const teams = this.teams.map(el => {
+                return (
+                    <div className="selectName">
+                        <label>{el} : </label> <input type="checkbox" name={el} checked={true}/>
+                    </div>
+                )
+            })
+        //}
+        const checks = (() => {if(this.state.biobricks) {return biobricks} else {return teams} })();
 
         return (
             <div>
@@ -41,9 +73,10 @@ class SearchBar extends Component {
                         value={this.state.search}
                         placeholder="Search for teams..."
                         onChange={this.onInputChange.bind(this)}/>
+                    <div>{checks}</div>
                     <button
                         type="submit"
-                        onClick={this.handleOnClick.bind(this)}>
+                        onClick={this.handleOnClick}>
                         Search
                     </button>
                 </form>
