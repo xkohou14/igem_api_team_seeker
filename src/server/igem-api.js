@@ -13,6 +13,7 @@ const codes = require('./server_codes'); // imports codes
 
 const teamHandler = require('./handlers/teamHandler');
 const biobricksHandler = require('./handlers/biobrickHandler');
+const usersHandler = require('./handlers/userHandler');
 
 api.use(morgan('dev'));
 api.use(parser.json());
@@ -26,6 +27,7 @@ api.use((request, response, next) => {
 
 api.use('/teams', teamHandler);
 api.use('/biobricks', biobricksHandler);
+api.use('/user', usersHandler);
 
 api.use((request, response, next) => {
     const e = Error("Request location not found. See: help");

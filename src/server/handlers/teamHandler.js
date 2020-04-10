@@ -53,7 +53,31 @@ router.get('/', (request, response, next) => {
     });
 });
 
-router.get('/match', (request, response, next) => {
+router.get('/structure', (request, response, next) => {
+    client.indices.getMapping({
+        index: indexString
+    }, (err, res) => {
+        if(err) {
+            response.status(codes.NOT_FOUND).json({
+                code : err.status,
+                message : err.message,
+            });
+        } else {
+            console.log("Mappings:\n",JSON.stringify(res, null, 4));
+            let properties = [];
+            let obj = res[indexString]["mappings"]["properties"];
+            for (var prop in obj) {
+                if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                    properties.push(prop);
+                }
+            }
+            console.log("Properties: " + properties);
+            response.status(codes.OK).json(properties);
+        }
+    });
+});
+
+router.post('/match', (request, response, next) => {
     client.search({
         index: indexString,
         scroll: '20s',
