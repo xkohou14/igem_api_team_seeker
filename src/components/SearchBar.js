@@ -22,6 +22,10 @@ class SearchBar extends Component {
 
     render() {
         const filteredTeams = this.props.items
+            .filter( item => item.title.toLowerCase().includes(this.state.search.toLowerCase())
+        );
+
+        // This function maps TeamItem Component to every search result object
         const teamComponents = filteredTeams.map(item => {
                 return (
                     <TeamItem key={item.id} item={item}/>
