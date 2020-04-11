@@ -18,9 +18,11 @@ object BiobricksScraper {
     fun parsePartList() = skrape {
         this.mode = Mode.DOM
         this.url = CONSTITUTIVE_URL
+        this.timeout = 15000
 
         extract {
             htmlDocument {
+                // Get url and name from every part link
                 findAll(".part_link").map {
                     BiobrickPart().apply {
                         url = it.attribute("href")
@@ -36,10 +38,12 @@ object BiobricksScraper {
      */
     fun parsePart(biobrick: BiobrickPart) = skrape {
 //        this.mode = Mode.DOM
+        this.timeout = 15000
         this.url = biobrick.url ?: throw IllegalArgumentException("Missing biobrick url")
 
         extract {
             htmlDocument {
+                // Get all text in paragraph elements
                 biobrick.apply { content = findAll("p").text }
             }
         }
