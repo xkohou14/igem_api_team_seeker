@@ -16,7 +16,6 @@ function BioBricksItem(props) {
                     {props.item.wiki}
                 </a>
             </p>
-
             <hr/>
         </div>
     )

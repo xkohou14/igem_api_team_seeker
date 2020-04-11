@@ -24,12 +24,12 @@ class App extends Component {
                     isLoaded : true,
                     teams: responseData.map(item => ({
                         title: item.title,
-                        wiki: item.wiki,
                         year: item.year,
                         description: item.abstract,
+                        teamId: item.teamId
                     }))
                 })
-                console.log("Response in Teams: " + JSON.stringify(responseData, ' ', 4))
+                // console.log("Response in Teams: " + JSON.stringify(responseData, ' ', 4))
             })
 
         fetch("http://localhost:3001/biobricks", {})
@@ -39,33 +39,12 @@ class App extends Component {
                     isLoaded : true,
                     biobricks: responseData.map(item => ({
                         title: item.title,
-                        wiki: item.url,
-                        year: item.year,
                         description: item.content,
+                        wiki: item.url,
                     }))
                 })
                 // console.log("Response in bio: " + JSON.stringify(responseData, ' ', 4))
             })
-
-        // fetch("http://localhost:3001/teams/structure")
-        //     .then(response => response.json())
-        //     .then(responseData => {
-        //         console.log("Structure : " + responseData);
-        //         this.setState({
-        //             ...this.state,
-        //             teams_structure : responseData
-        //         })
-        //     });
-        //
-        // fetch("http://localhost:3001/biobricks/structure")
-        //     .then(response => response.json())
-        //     .then(responseData => {
-        //         console.log("Structure : " + responseData);
-        //         this.setState({
-        //             ...this.state,
-        //             biobricks_structure : responseData
-        //         })
-        //     });
     }
 
     clickMaster() {
