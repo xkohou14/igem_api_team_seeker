@@ -1,24 +1,16 @@
 .team-item-header {
     color: #0B9568;
     padding-left: 4%;
-    padding-right: 4%;
-    font-size: 16px;
+    font-size: 18px;
     text-align: left;
 }
 
 .team-item-descr {
     padding-left: 4%;
-    padding-right: 4%;
-    text-align: justify;
+    text-align: left;
 }
 
 .team-item-wiki {
     padding-left: 4%;
     text-align: left;
-}
-
-.wiki-link {
-    color: #0B9568;
-    text-align: left;
-
 }
