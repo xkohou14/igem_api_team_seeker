@@ -25,12 +25,21 @@ class App extends Component {
                         description: item.abstract,
                     }))
                 })
+
+                // console.log(this.state.items[9].title)
+
+                // for (let i = 0; i < 11; i++) {
+                //     if (typeof this.state.items[i].title != 'undefined') {
+                //         console.log(this.state.items[i].title.toLowerCase().includes("cell"))
+                //     }
+                // }
+
             })
     }
 
     render() {
         if(this.state.isLoaded) {
-            console.log(this.state.items)
+            // console.log(this.state.items)
         }
 
         return (
