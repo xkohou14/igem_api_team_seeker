@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import TeamItem from "./TeamItem";
 import './SearchBar.css';
 
-class SearchBar extends Component {
+class SearchBarTeams extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -105,20 +105,21 @@ class SearchBar extends Component {
 
         return (
             <div>
+                <h1 className="App-header">Team Seeker</h1>
+                <button
+                    className="btn-search"
+                    type="submit"
+                    onClick={this.handleOnClickBio.bind(this)}>
+                    {this.state.btnName}
+                </button>
                 <form className="form">
                     <input
                         className="search"
                         type="text"
                         value={this.state.search}
-                        placeholder={"Search for " + this.state.btnName + " ..."}
+                        placeholder={"Search for teams ..."}
                         onChange={this.onInputChange.bind(this)}/>
                     {/*<div>{checks}</div>*/}
-                    <button
-                        className="btn-search"
-                        type="submit"
-                        onClick={this.handleOnClickBio.bind(this)}>
-                        {this.state.btnName}
-                    </button>
                     <button
                         className="btn-search"
                         type="submit"
@@ -135,4 +136,4 @@ class SearchBar extends Component {
 
 }
 
-export default SearchBar
+export default SearchBarTeams

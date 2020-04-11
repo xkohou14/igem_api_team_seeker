@@ -2,14 +2,13 @@ import React from "react";
 import './TeamItem.css'
 
 // Component for displaying one team card in the main page
-function TeamItem(props) {
+function BioBricksItem(props) {
     return (
         <div className="team-item">
             <h2 className="team-item-header">
-                <span className="span">{props.item.year + " "}</span>
-                {" " + props.item.title}</h2>
+                {props.item.title}</h2>
             <p className="team-item-descr">{props.item.description}</p>
-            <p className="team-item-wiki">{"wiki: "}
+            <p className="team-item-wiki">{"url: "}
                 <a className="wiki-link"
                    href={props.item.wiki}
                    target="_blank"
@@ -23,4 +22,4 @@ function TeamItem(props) {
     )
 }
 
-export default TeamItem
+export default BioBricksItem
