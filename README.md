@@ -42,12 +42,48 @@ Api support following requests
 ####GET
 - `localhost:3001/teams`
 
- returns all teams registered in iGEM.
+ returns all teams registered in iGEM. Team data structure is following...
+ ```     
+ {
+   "teamId": String,
+   "name": String,
+   "region": String,
+   "country": String,
+   "track": String,
+   "section": String,
+   "size": Number,
+   "status": Number,
+   "year": Number,
+   "kind": String,
+   "teamCode": Number, --> unique in iGEM
+   "division": String,
+   "schoolAddress": String,
+   "title": String, --> team Name
+   "abstract": String,
+   "primaryPi": String,
+   "secondaryPi": String,
+   "instructors": [String],
+   "studentLeaders": [String],
+   "studentMembers": [String],
+   "advisors": [String]
+ }
+ ```
+Make GET request `localhost:3001/teams/structure` to take these attributes listed.
  
  - `localhost:3001/biobricks`
- 
-  returns all biobricks registered in iGEM.
- 
+
+returns all biobricks registered in iGEM. 
+```     
+{
+  "title": String,
+  "content": String,
+  "url": String
+}
+```
+Make GET request `localhost:3001/biobricks/structure` to take these attributes listed.
+
+####POST  
+
  - `localhost:3001/teams/match`
  - `localhost:3001/biobricks/match`
  
@@ -62,47 +98,55 @@ Api support following requests
 }
 ```
 where NAME is name of label (attribute to search)
-     contain is a flag if it is must be found in textfield or not. Team data structure is following...
-```     
-{
-  "teamId": String,
-  "name": String,
-  "region": String,
-  "country": String,
-  "track": String,
-  "section": String,
-  "size": Number,
-  "status": Number,
-  "year": Number,
-  "kind": String,
-  "teamCode": Number,
-  "division": String,
-  "schoolAddress": String,
-  "title": String,
-  "abstract": String,
-  "primaryPi": String,
-  "secondaryPi": String,
-  "instructors": [String],
-  "studentLeaders": [String],
-  "studentMembers": [String],
-  "advisors": [String]
-}
-```
+     contain is a flag if it is must be found in textfield or not.
 
      
 This example will return all teams registered in 2020 which name contains "team" but doesn't contain "2".
 ```
-GET: localhost:3001/teams/match
+POST: localhost:3001/teams/match
 {
     "name":[{"contain":false, "value": "2"}, {"contain":true, "value": "team"}],
     "year":[{"contain":true, "value": "2020"}]
 }
 ```
-####POST
+##### Insert
+make POST request to these urls
 - `localhost:3001/teams`
 - `localhost:3001/biobricks`
 
-With body attributes like in structure description above.
+with body attributes like in structure description above.
+For insertion some authentication is required.
+Use `localhost:3001/user` for it
+- `localhost:3001/users/signup` - to create an account
+- `localhost:3001/users/login` - to log in
+
+See examples to create account.
+```
+POST: localhost:3001/user/signup
+{
+    "email": "test@email.com",
+    "password": "testPassword"
+}
+```
+
+See examples to log in.
+```
+POST: localhost:3001/user/login
+{
+    "email": "test@email.com",
+    "password": "testPassword"
+}
+
+response = {
+               "message": "Auth successful",
+               "code": 200,
+               "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jeiIsImlkIjoiMG5LZGFYRUJqVkx4NDluOHdKckYiLCJpYXQiOjE1ODY2MjI4MjgsImV4cCI6MTU4NjYyNjQyOH0.kZZXX0voaiSidBMi0vi2LIvKMNXuRXAzrthUQt3hoKo"
+           }
+```
+If auth procedure is successful, token is given in answer. Use this token in authorization <b>header</b> with Bearer like this:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jeiIsImlkIjoiMG5LZGFYRUJqVkx4NDluOHdKckYiLCJpYXQiOjE1ODY2MjI4MjgsImV4cCI6MTU4NjYyNjQyOH0.kZZXX0voaiSidBMi0vi2LIvKMNXuRXAzrthUQt3hoKo
+``` 
 
 --------------------------------------------
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
