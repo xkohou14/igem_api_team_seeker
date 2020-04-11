@@ -9,7 +9,15 @@ function TeamItem(props) {
                 <span className="span">{props.item.year + " "}</span>
                 {" " + props.item.title}</h2>
             <p className="team-item-descr">{props.item.description}</p>
-            <p className="team-item-wiki"> wiki: {props.item.wiki}</p>
+            <p className="team-item-wiki">{"wiki: "}
+                <a className="wiki-link"
+                   href={props.item.wiki}
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    {props.item.wiki}
+                </a>
+            </p>
+
             <hr/>
         </div>
     )

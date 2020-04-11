@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import TeamItem from "./TeamItem";
-import './SearchBar.css';
+//import './Sidebar.css';
 
 class SearchBarTeams extends Component {
     constructor(props) {
@@ -8,97 +8,52 @@ class SearchBarTeams extends Component {
         this.state = {
             search: '',
             results: [],
-            selectedOption: "abstract",
-            contain: true
+            biobricks : false
         }
-        this.tags = ["title", "year", "abstract"]
-        this.master = this.props.master
-        this.query = {}
-        this.searchList = {searchList: []};
-        this.handleOnClick = this.handleOnClick.bind(this)
-        this.fetchData = this.fetchData.bind(this)
-        this.addToQuery = this.addToQuery.bind(this)
-    }
+        this.master = this.props.master;
+        // this.teams = this.props.team_struture;
+        // this.biobricks = this.props.biobricks_struture;
 
-    handleOnClick(event) {
-        event.preventDefault();
-        console.log(this.query)
-        this.fetchData()
-    }
+        this.handleOnClick = this.handleOnClick.bind(this);
+    };
 
-    handleOnClickBio(event) {
-        event.preventDefault();
+    handleOnClick(e) {
+        e.preventDefault();
+        console.log("clicked search button " + this.state.search);
         this.master.clickMaster();
     }
 
-    addToQuery (tag) {
-        this.query = {}
-        if (tag === "year" && this.state.search.match(/^[A-Za-z]+$/))
-            return
-        this.query[tag] = [{
-            contain: this.state.contain,
-            value: this.state.search
-        }];
-        this.fetchData()
-        // console.log(this.query)
+    formQuery() {
     }
 
-    async checkChanged(event) {
-        // await new Promise(resolve => this.setState({ selectedOption: event.target.value }, () => resolve()))
-        await this.setState({
-            selectedOption: event.target.value
-        })
-        this.addToQuery (this.state.selectedOption)
-    }
-
-    checkContainsChanged() {
+    onInputChange(event) {
         this.setState({
-            contain: !this.state.contain
+            search: event.target.value.toString().toLowerCase()
         })
-    }
-
-    fetchData() {
-        console.log("Handling query: " + JSON.stringify(this.query, ' ', 4))
+        const query = {
+            name:[{contain:false, value: "2"}, {contain:true, value: "team"}],
+            year:[{contain:true, value: 2020}]
+        }
+        console.log("Handling query: " + JSON.stringify(query, ' ', 4))
         fetch("http://localhost:3001/teams/match", {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(this.query)
-        })
+            body: JSON.stringify(query)})
             .then(response => response.json())
             .then(responseData => {
                 console.log("Response: " + JSON.stringify(responseData, ' ', 4))
                 this.setState({
                     results: responseData.map(item => ({
-                        title: item.title,
+                        title: item.name,
                         year: item.year,
-                        description: item.abstract,
-                        teamId: item.teamId
+                        description: item.description,
+                        wiki: item.wiki,
                     }))
                 })
             })
-    }
-
-    async onInputChange(event) {
-        await this.setState({
-            search: event.target.value
-        })
-        this.addToQuery(this.state.selectedOption)
-        this.fetchData()
-    }
-
-    handleAddTag() {
-        const searchList = this.state.searchList;
-        this.setState({
-            searchList: searchList.concat(<input
-                className="search"
-                type="text"
-                value={this.state.search}
-                placeholder={"Search for teams ..."}
-                onChange={this.onInputChange.bind(this)}/>)
-        });
     }
 
     render() {
@@ -112,66 +67,62 @@ class SearchBarTeams extends Component {
             }
         );
 
-        const checks = this.tags.map(element => {
-            return (
-                <div className="checkbox-tag">
-                    <label>
-                        {element}
-                    </label>
-                    <input
-                        type="radio"
-                        value={element}
-                        checked={this.state.selectedOption === element}
-                        onChange={this.checkChanged.bind(this)}
-                    />
-                </div>
-            )
-        })
+        // //if (this.state.biobricks) {
+        // const biobricks = this.biobricks.map(el => {
+        //         return (
+        //             <div className="selectName">
+        //                 <label>{el} : </label> <input type="checkbox" name={el} checked={true}/>
+        //             </div>
+        //         )
+        //     })
+        // //} else {
+        // const teams = this.teams.map(el => {
+        //         return (
+        //             <div className="selectName">
+        //                 <label>{el} : </label> <input type="checkbox" name={el} checked={true}/>
+        //             </div>
+        //         )
+        //     })
+        // //}
+        // const checks = (() => {if(this.state.biobricks) {return biobricks} else {return teams} })();
 
         return (
             <div>
                 <h1 className="App-header">Team Seeker</h1>
                 <button
-                    className="btn-switch"
-                    type="submit"
-                    onClick={this.handleOnClickBio.bind(this)}>
-                    BioBricks
-                </button>
-                <button
                     className="btn-search"
                     type="submit"
-                    onClick={this.handleOnClick}>
-                    Search
+                    onClick={this.handleOnClickBio.bind(this)}>
+                    {this.state.btnName}
                 </button>
                 <form className="form">
                     <input
                         className="search"
                         type="text"
                         value={this.state.search}
+<<<<<<<< HEAD:src/components/SearchBarTeams.js
                         placeholder={"Search for teams ..."}
-                        onChange={this.onInputChange.bind(this)}
-                    />
+========
+                        placeholder="Search for teams..."
+>>>>>>>> search for Bio and Teams separated:src/components/SearchBar.js
+                        onChange={this.onInputChange.bind(this)}/>
+                    {/*<div>{checks}</div>*/}
                     <button
                         className="btn-search"
                         type="submit"
-                        onClick={this.handleAddTag.bind(this)}>
-                        add tag
+<<<<<<<< HEAD:src/components/SearchBarTeams.js
+========
+                        onClick={this.handleOnClick}>
+                        BioBricks
                     </button>
-                    {/*{this.searchList.map(input => { return input*/}
-                    {/*})}*/}
+                    <button
+                        className="btn-search"
+                        type="submit"
+>>>>>>>> search for Bio and Teams separated:src/components/SearchBar.js
+                        onClick={this.handleOnClick}>
+                        Search
+                    </button>
                 </form>
-                <div className="checkbox-tag">
-                    <label>
-                        contains
-                    </label>
-                    <input
-                        type="checkbox"
-                        name="contains"
-                        checked={this.state.contain}
-                        onChange={this.checkContainsChanged.bind(this)}
-                    />
-                </div>
-                {checks}
                 <div>
                     {teamComponents}
                 </div>

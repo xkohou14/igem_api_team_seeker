@@ -12,13 +12,11 @@
     border: #0B9568;
     color: white;
     width: 100px;
-    padding: 5px;
+    padding: 10px;
     display: inline-block;
-    font-size: 16px;
+    font-size: 14px;
     margin: 5px;
+    margin-bottom: 20px;
     border-radius: 5px;
     align-self: center;
-}
-
-.form {
 }

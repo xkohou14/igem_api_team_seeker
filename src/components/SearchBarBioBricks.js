@@ -8,83 +8,59 @@ class SearchBarBioBricks extends Component {
         this.state = {
             search: '',
             results: [],
-            selectedOption: "content",
-            contain: true
+            biobricks: false,
+            btnName: "BioBricks",
         }
-        this.tags = ["title", "content"]
-        this.master = this.props.master
-        this.query = {}
-        this.handleOnClick = this.handleOnClick.bind(this)
-        this.fetchData = this.fetchData.bind(this)
-        this.addToQuery = this.addToQuery.bind(this)
-    }
+        this.master = this.props.master;
+        // this.teams = this.props.team_struture;
+        // this.biobricks = this.props.biobricks_struture;
 
-    handleOnClick(event) {
-        event.preventDefault();
-        console.log(this.query)
-        this.fetchData()
-    }
+        this.handleOnClick = this.handleOnClick.bind(this);
+    };
 
-    handleOnClickBio(event) {
-        event.preventDefault();
+    handleOnClick(e) {
+        e.preventDefault();
+        console.log("clicked search button " + this.state.search);
         this.master.clickMaster();
     }
 
-    addToQuery (tag) {
-        this.query = {}
-        if (tag === "year" && this.state.search.match(/^[A-Za-z]+$/))
-            return
-        this.query[tag] = [{
-            contain: this.state.contain,
-            value: this.state.search
-        }];
-        this.fetchData()
-        // console.log(this.query)
+    handleOnClickBio(e) {
+        e.preventDefault();
+        this.master.clickMaster();
     }
 
-    async checkChanged(event) {
-        await this.setState({
-            selectedOption: event.target.value
-        })
-        this.addToQuery (this.state.selectedOption)
+    formQuery() {
     }
 
-    checkContainsChanged() {
+    onInputChange(event) {
         this.setState({
-            contain: !this.state.contain
+            search: event.target.value.toString().toLowerCase()
         })
-    }
-
-    fetchData() {
-        console.log("Handling query: " + JSON.stringify(this.query, ' ', 4))
+        const query = {
+            title: [{contain: false, value: "2"}, {contain: true, value: "team"}],
+            year: [{contain: true, value: 2020}]
+        }
+        console.log("Handling query: " + JSON.stringify(query, ' ', 4))
         fetch("http://localhost:3001/biobricks/match", {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(this.query)
+            body: JSON.stringify(query)
         })
             .then(response => response.json())
             .then(responseData => {
                 console.log("Response: " + JSON.stringify(responseData, ' ', 4))
                 this.setState({
                     results: responseData.map(item => ({
-                        title: item.title,
+                        title: item.name,
                         year: item.year,
-                        description: item.content,
-                        wiki: item.url,
+                        description: item.description,
+                        wiki: item.wiki,
                     }))
                 })
             })
-    }
-
-    async onInputChange(event) {
-        await this.setState({
-            search: event.target.value
-        })
-        this.addToQuery(this.state.selectedOption)
-        this.fetchData()
     }
 
     render() {
@@ -98,36 +74,29 @@ class SearchBarBioBricks extends Component {
             }
         );
 
-        const checks = this.tags.map(element => {
-            return (
-                <div className="checkbox-tag">
-                    <label>
-                        {element}
-                    </label>
-                    <input
-                        type="radio"
-                        value={element}
-                        checked={this.state.selectedOption === element}
-                        onChange={this.checkChanged.bind(this)}
-                    />
-                </div>
-            )
-        })
+        // const biobricks = this.biobricks.map(element => {
+        //     return (
+        //         <div className="selectName">
+        //             <label>
+        //                 {element} :
+        //             </label>
+        //             <input
+        //                 type="checkbox"
+        //                 name={element}
+        //                 checked={true}
+        //             />
+        //         </div>
+        //     )
+        // })
 
         return (
             <div>
                 <h1 className="App-header">BioBricks Seeker</h1>
                 <button
-                    className="btn-switch"
+                    className="btn-search"
                     type="submit"
                     onClick={this.handleOnClickBio.bind(this)}>
                     Teams
-                </button>
-                <button
-                    className="btn-search"
-                    type="submit"
-                    onClick={this.handleOnClick}>
-                    Search
                 </button>
                 <form className="form">
                     <input
@@ -135,29 +104,22 @@ class SearchBarBioBricks extends Component {
                         type="text"
                         value={this.state.search}
                         placeholder={"Search for BioBricks ..."}
-                        onChange={this.onInputChange.bind(this)}
-                    />
+                        onChange={this.onInputChange.bind(this)}/>
+                    {/*<div>{biobricks}</div>*/}
+                    <button
+                        className="btn-search"
+                        type="submit"
+                        onClick={this.handleOnClick}>
+                        Search
+                    </button>
                 </form>
-                <div>
-                    <div className="checkbox-tag">
-                        <label>
-                            contains
-                        </label>
-                        <input
-                            type="checkbox"
-                            name="contains"
-                            checked={this.state.contain}
-                            onChange={this.checkContainsChanged.bind(this)}
-                        />
-                    </div>
-                    {checks}
-                </div>
                 <div>
                     {bioComponents}
                 </div>
             </div>
         )
     }
+
 }
 
 export default SearchBarBioBricks
