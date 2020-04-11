@@ -89,7 +89,7 @@ function buildQuery(object) {
 
     query_obj = {
         bool : {
-            must : must,
+            should : must,
             must_not : must_not
         }
     };
