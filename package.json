@@ -13,10 +13,11 @@
     "morgan": "^1.10.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "react-search-field": "^1.0.0"
   },
   "scripts": {
-    "start": "concurrently react-scripts start && server",
+    "start": "concurrently \"react-scripts start\" \"nodemon src/server/server.js\" ",
     "server": "nodemon src/server/server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
