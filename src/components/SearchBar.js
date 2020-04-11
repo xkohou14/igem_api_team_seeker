@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import TeamItem from "./TeamItem";
-import './Sidebar.css';
+//import './Sidebar.css';
 
 class SearchBar extends Component {
     constructor(props) {
@@ -34,16 +34,20 @@ class SearchBar extends Component {
         // "name":[{"contain":false, "value": "2"}, {"contain":true, "value": "team"}],
         //     "year":[{"contain":true, "value": "2020"}]
         const query = {
-            "name":[{"contain":false, "value": "2"}, {"contain":true, "value": "team"}],
-            "year":[{"contain":true, "value": "2020"}]
+            name:[{contain:false, value: "2"}, {contain:true, value: "team"}],
+            year:[{contain:true, value: 2020}]
         }
-        console.log(query)
-        fetch("http://localhost:3001/teams/match", {method: "POST", body: JSON.stringify({
-                "name":[{"contain":false, "value": "2"}, {"contain":true, "value": "team"}],
-                "year":[{"contain":true, "value": "2020"}]
-            })})
+        console.log("Handling query: " + JSON.stringify(query, ' ', 4))
+        fetch("http://localhost:3001/teams/match", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(query)})
             .then(response => response.json())
             .then(responseData => {
+                console.log("Response: " + JSON.stringify(responseData, ' ', 4))
                 this.setState({
                     results: responseData.map(item => ({
                         title: item.title,
