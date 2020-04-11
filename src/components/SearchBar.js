@@ -29,10 +29,7 @@ class SearchBar extends Component {
     onInputChange(event) {
         this.setState({
             search: event.target.value.toString().toLowerCase()
-                // .toString().substr(0,20)
         })
-        // "name":[{"contain":false, "value": "2"}, {"contain":true, "value": "team"}],
-        //     "year":[{"contain":true, "value": "2020"}]
         const query = {
             name:[{contain:false, value: "2"}, {contain:true, value: "team"}],
             year:[{contain:true, value: 2020}]
@@ -50,22 +47,20 @@ class SearchBar extends Component {
                 console.log("Response: " + JSON.stringify(responseData, ' ', 4))
                 this.setState({
                     results: responseData.map(item => ({
-                        title: item.title,
-                        wiki: item.wiki,
+                        title: item.name,
                         year: item.year,
-                        description: item.abstract,
+                        description: item.description,
+                        wiki: item.wiki,
                     }))
                 })
             })
     }
 
     render() {
-        const filteredTeams = this.props.items
-            .filter( item => item.toString().toLowerCase().includes(this.state.search.toLowerCase())
-            );
+        const filteredTeams = this.state.search.length > 0 && this.state.results.length > 0 ? this.state.results : this.props.items
 
         // This function maps TeamItem Component to every search result object
-        const teamComponents = filteredTeams.map(item => {
+        const teamComponents = filteredTeams.filter(item => item.title !== undefined).map(item => {
                 return (
                     <TeamItem key={item.id} item={item}/>
                 )
@@ -115,9 +110,7 @@ class SearchBar extends Component {
                     </button>
                 </form>
                 <div>
-                    {console.log(this.state.results)}
-
-                    {/*{teamComponents}*/}
+                    {teamComponents}
                 </div>
             </div>
         )
