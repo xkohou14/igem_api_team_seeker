@@ -1,0 +1,22 @@
+.search {
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    width: 80%;
+    padding: 10px;
+    margin: 5px;
+    box-shadow: 1px 9px 8px -12px rgba(0, 0, 0, 0.75);
+}
+
+.btn-search {
+    background-color: #0B9568;
+    border: #0B9568;
+    color: white;
+    width: 100px;
+    padding: 10px;
+    display: inline-block;
+    font-size: 14px;
+    margin: 5px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    align-self: center;
+}

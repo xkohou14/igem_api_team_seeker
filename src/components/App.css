@@ -1,0 +1,16 @@
+.App {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.App-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: sans-serif;
+    font-weight: lighter;
+    font-size: xx-large;
+}

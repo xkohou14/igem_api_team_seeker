@@ -46,6 +46,8 @@
 const morgen = require('morgan');
 
 function buildQuery(object) {
+    console.log("Received object: " + JSON.stringify(object, ' ', 2));
+
     let query_obj = {}, must = [], must_not = [];
 
     for (var prop in object) {
@@ -92,7 +94,7 @@ function buildQuery(object) {
         }
     };
 
-    //console.log(query_obj);
+    console.log("Build query: " + JSON.stringify(query_obj, ' ', 2));
     return query_obj;
 }
 
