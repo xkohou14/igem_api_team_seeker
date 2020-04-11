@@ -5,20 +5,25 @@
 const express = require('express');
 const router = express.Router();
 const codes = require('../server_codes');
-const elasticSearch = require('elasticsearch');
 const buildQuery = require('./query_builder');
 const bcrypt = require('bcrypt');
+const shared = require('./shared');
+const jwt = require('jsonwebtoken');
+const checkAuth = require('./auth_checker');
 
-let client = new elasticSearch.Client({
-    host : 'https://elasticsearch.kusik.net',
-    log: 'trace'
-});
+let client = shared.client;
 let indexString = "users";
 
 function encrypt (pwd) {
     return bcrypt.hashSync(pwd, bcrypt.genSaltSync(12));
 }
 
+/**
+ * Checks if biobricks element with email exists
+ * @param email of email
+ * @param exists action to do if it's exists
+ * @param nonExist action to do if it doesn't exist
+ */
 function userExists (email, exists, nonExist) {
     client.search({
         index: indexString,
@@ -36,7 +41,7 @@ function userExists (email, exists, nonExist) {
         }
     }, (err, res) => {
         if(err) {
-            return false;
+            nonExist();
         } else {
             let allHits = [];
             res.hits.hits.forEach((hit) => {
@@ -48,15 +53,6 @@ function userExists (email, exists, nonExist) {
                 }
             });
 
-            /*if (res.hits.total !== allHits.length) {
-                client.scroll({
-                    scrollId: res._scroll_id,
-                    scroll: '10s'
-                }, () => {console.log("There ara more results")});
-            } else {
-                console.log('all done', allHits);
-            }*/
-
             if (allHits.length > 0)  {
                 exists();
             } else {
@@ -66,7 +62,30 @@ function userExists (email, exists, nonExist) {
     });
 }
 
+/**
+ * Checks if object contains attribute
+ * @param object to check
+ * @param attr which should be contained in object
+ * @returns {boolean}
+ */
+function containsAttribute (object, attr) {
+    return object.hasOwnProperty(attr);
+}
+
 router.post('/signup', (request, response, next) => {
+    if(!containsAttribute(request.body,"email")) {
+        return response.status(codes.UNPROCESSABLE_ENTITY).json({
+            code : codes.UNPROCESSABLE_ENTITY,
+            message : "Object does not contain required property : email"
+        });
+    }
+    if(!containsAttribute(request.body,"password")) {
+        return response.status(codes.UNPROCESSABLE_ENTITY).json({
+            code : codes.UNPROCESSABLE_ENTITY,
+            message : "Object does not contain required property : password"
+        });
+    }
+
     let hashPwd = encrypt(request.body.password);
 
     if (hashPwd == -1) {
@@ -82,7 +101,7 @@ router.post('/signup', (request, response, next) => {
             body : {
                 email : request.body.email,
                 password : hashPwd,
-                trusted : false
+                trusted : true
             }
         }, (err, req, res) => {
             if(err) {
@@ -101,7 +120,7 @@ router.post('/signup', (request, response, next) => {
     };
 
     let exist = () => {
-        response.status(codes.SERVER_ERROR).json({
+        response.status(codes.UNPROCESSABLE_ENTITY).json({
             code : codes.UNPROCESSABLE_ENTITY,
             message : "User under " + request.body.email + " already exists"
         })
@@ -110,7 +129,101 @@ router.post('/signup', (request, response, next) => {
     userExists(request.body.email, exist, nonExist);
 });
 
-router.delete('/', (request, response, next) => {
+router.post('/login', (request, response, next) => {
+    if(!containsAttribute(request.body,"email")) {
+        return response.status(codes.UNPROCESSABLE_ENTITY).json({
+            code : codes.UNPROCESSABLE_ENTITY,
+            message : "Object does not contain required property : email"
+        });
+    }
+    if(!containsAttribute(request.body,"password")) {
+        return response.status(codes.UNPROCESSABLE_ENTITY).json({
+            code : codes.UNPROCESSABLE_ENTITY,
+            message : "Object does not contain required property : password"
+        });
+    }
+
+    let hashPwd = encrypt(request.body.password);
+
+    if (hashPwd == -1) {
+        return response.status(codes.AUTH_FAILED).json({
+            code : codes.AUTH_FAILED,
+            message : "Login failed (bcrypt error)"
+        })
+    }
+
+    client.search({
+        index : indexString,
+        scroll: '1s',
+        body: {
+            query: {
+                bool : {
+                    must : [
+                        {match : {
+                            email : request.body.email
+                        }},
+                        {match : {
+                            trusted : true
+                        }}
+                    ]
+                }
+            }
+        }
+    }, (err, res) => {
+        if(err) {
+            response.status(codes.SERVER_ERROR).json({
+                code : err.status,
+                message : err.message
+            });
+        } else {
+            let allHits = [];
+            res.hits.hits.forEach(function (hit) {
+                if (
+                    bcrypt.compareSync(request.body.password, hit._source.password) &&
+                    request.body.email == hit._source.email
+                ) {
+                    allHits.push({
+                        id: hit._id,
+                        ...hit._source
+                    });
+                }
+            });
+
+            if (allHits.length >= 1) {
+                const token = jwt.sign({
+                    email: allHits[0].email,
+                    id: allHits[0].id
+                }, shared.JWT_KEY, {
+                    expiresIn: "1h"
+                });
+                response.status(codes.OK).json({
+                    message : "Auth successful",
+                    code : codes.OK,
+                    token : token
+                });
+            } else {
+                response.status(codes.AUTH_FAILED).json({
+                    code : codes.AUTH_FAILED,
+                    message : "Login failed"
+                })
+            }
+        }
+    });
+});
+
+router.delete('/', checkAuth,(request, response, next) => {
+    if(!containsAttribute(request.body,"email")) {
+        return response.status(codes.UNPROCESSABLE_ENTITY).json({
+            code : codes.UNPROCESSABLE_ENTITY,
+            message : "Object does not contain required property : email"
+        });
+    }
+    if(!containsAttribute(request.body,"password")) {
+        return response.status(codes.UNPROCESSABLE_ENTITY).json({
+            code : codes.UNPROCESSABLE_ENTITY,
+            message : "Object does not contain required property : password"
+        });
+    }
     let hashPwd = encrypt(request.body.password);
 
     if (hashPwd == -1) {
@@ -166,7 +279,7 @@ router.delete('/', (request, response, next) => {
                                     message : err.message
                                 });
                             } else {
-                                response.status(codes.CREATED).json({
+                                response.status(codes.OK).json({
                                     message : "Object deleted",
                                     code : codes.OK
                                 });
@@ -177,7 +290,7 @@ router.delete('/', (request, response, next) => {
             });
         },
         () => {
-            response.status(codes.SERVER_ERROR).json({
+            response.status(codes.UNPROCESSABLE_ENTITY).json({
                 code : codes.UNPROCESSABLE_ENTITY,
                 message : "User under " + request.body.email + " doesn't exists"
             })
