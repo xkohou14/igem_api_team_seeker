@@ -7,7 +7,9 @@ class App extends Component {
         super(props)
         this.state = {
             isLoaded: false,
-            items: []
+            items: [],
+            biobricks_structure : [],
+            teams_structure : []
         }
     }
 
@@ -18,6 +20,7 @@ class App extends Component {
             .then(response => response.json())
             .then(responseData => {
                 this.setState({
+                    isLoaded : true,
                     items: responseData.map(item => ({
                         title: item.title,
                         wiki: item.wiki,
@@ -35,6 +38,31 @@ class App extends Component {
                 // }
 
             })
+            });
+
+        fetch("http://localhost:3001/teams/structure")
+            .then(response => response.json())
+            .then(responseData => {
+                console.log("Structure : " + responseData);
+                this.setState({
+                    ...this.state,
+                    teams_structure : responseData
+                })
+            });
+
+        fetch("http://localhost:3001/biobricks/structure")
+            .then(response => response.json())
+            .then(responseData => {
+                console.log("Structure : " + responseData);
+                this.setState({
+                    ...this.state,
+                    biobricks_structure : responseData
+                })
+            });
+    }
+
+    clickMaster() {
+        console.log("Someone clicked me.");
     }
 
     render() {
@@ -47,7 +75,7 @@ class App extends Component {
             <div className="App">
                 <nav>
                     <h1 className="App-header">Team Seeker</h1>
-                    <SearchBar items={this.state.items}/>
+                    <SearchBar items={this.state.items} master={this} team_structure={this.state.teams_structure} biobricks_structure={[]}/>
                     {/*<p>{text}</p>*/}
                 </nav>
             </div>
