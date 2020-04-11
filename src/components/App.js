@@ -9,14 +9,14 @@ class App extends Component {
             isLoaded: false,
             items: [],
             biobricks_structure : [],
-            teams_structure : []
+            // teams_structure : []
         }
     }
 
     componentDidMount() {
         this.setState({isLoaded: true})
 
-        fetch("http://localhost:3001/teams")
+        fetch("http://localhost:3001/teams/structure")
             .then(response => response.json())
             .then(responseData => {
                 this.setState({
@@ -29,8 +29,6 @@ class App extends Component {
                     }))
                 })
 
-                // console.log(this.state.items[9].title)
-
                 // for (let i = 0; i < 11; i++) {
                 //     if (typeof this.state.items[i].title != 'undefined') {
                 //         console.log(this.state.items[i].title.toLowerCase().includes("cell"))
@@ -38,27 +36,26 @@ class App extends Component {
                 // }
 
             })
-            });
 
-        fetch("http://localhost:3001/teams/structure")
-            .then(response => response.json())
-            .then(responseData => {
-                console.log("Structure : " + responseData);
-                this.setState({
-                    ...this.state,
-                    teams_structure : responseData
-                })
-            });
-
-        fetch("http://localhost:3001/biobricks/structure")
-            .then(response => response.json())
-            .then(responseData => {
-                console.log("Structure : " + responseData);
-                this.setState({
-                    ...this.state,
-                    biobricks_structure : responseData
-                })
-            });
+        // fetch("http://localhost:3001/teams/structure")
+        //     .then(response => response.json())
+        //     .then(responseData => {
+        //         console.log("Structure : " + responseData);
+        //         this.setState({
+        //             ...this.state,
+        //             teams_structure : responseData
+        //         })
+        //     });
+        //
+        // fetch("http://localhost:3001/biobricks/structure")
+        //     .then(response => response.json())
+        //     .then(responseData => {
+        //         console.log("Structure : " + responseData);
+        //         this.setState({
+        //             ...this.state,
+        //             biobricks_structure : responseData
+        //         })
+        //     });
     }
 
     clickMaster() {
@@ -75,7 +72,12 @@ class App extends Component {
             <div className="App">
                 <nav>
                     <h1 className="App-header">Team Seeker</h1>
-                    <SearchBar items={this.state.items} master={this} team_structure={this.state.teams_structure} biobricks_structure={[]}/>
+                    <SearchBar
+                        items={this.state.items}
+                        master={this}
+                        // team_structure={this.state.teams_structure}
+                        // biobricks_structure={[]}
+                    />
                     {/*<p>{text}</p>*/}
                 </nav>
             </div>
