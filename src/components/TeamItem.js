@@ -1,7 +1,7 @@
 import React from "react";
 import './TeamItem.css'
 
-// Component for displaying one team card in the main page
+// Component for displaying one team card in the team search
 function TeamItem(props) {
     return (
         <div className="team-item">
@@ -11,13 +11,12 @@ function TeamItem(props) {
             <p className="team-item-descr">{props.item.description}</p>
             <p className="team-item-wiki">{"wiki: "}
                 <a className="wiki-link"
-                   href={props.item.wiki}
+                   href={"https://igem.org/Team.cgi?team_id=" + props.item.teamId}
                    target="_blank"
                    rel="noopener noreferrer">
-                    {props.item.wiki}
+                    {"https://igem.org/Team.cgi?team_id=" + props.item.teamId}
                 </a>
             </p>
-
             <hr/>
         </div>
     )
