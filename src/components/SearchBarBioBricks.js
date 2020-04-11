@@ -8,63 +8,79 @@ class SearchBarBioBricks extends Component {
         this.state = {
             search: '',
             results: [],
-            biobricks: false,
-            btnName: "BioBricks",
+            title: true,
+            content: true,
+            contain: true
         }
-        this.master = this.props.master;
-        // this.teams = this.props.team_struture;
-        // this.biobricks = this.props.biobricks_struture;
-
-        this.handleOnClick = this.handleOnClick.bind(this);
-    };
+        this.tags = ["title", "content"]
+        this.master = this.props.master
+        this.query = {}
+        this.handleOnClick = this.handleOnClick.bind(this)
+        this.fetchData = this.fetchData.bind(this)
+    }
 
     handleOnClick(e) {
         e.preventDefault();
-        console.log("clicked search button " + this.state.search);
+        // console.log("clicked search button " + this.state.search);
+        console.log(this.query)
+        this.fetchData()
+    }
+
+    handleOnClickBio(event) {
+        event.preventDefault();
         this.master.clickMaster();
     }
 
-    handleOnClickBio(e) {
-        e.preventDefault();
-        this.master.clickMaster();
-    }
-
-    formQuery() {
-    }
-
-    onInputChange(event) {
-        this.setState({
-            search: event.target.value.toString().toLowerCase()
-        })
-        const query = {
-            title: [{contain: false, value: "2"}, {contain: true, value: "team"}],
-            year: [{contain: true, value: 2020}]
+    checkChanged(event) {
+        if (event.target.checked) {
+            this.query[event.target.name] = [{
+                contain: this.state.contain,
+                value: this.state.search
+            }];
+            console.log(this.query)
         }
-        console.log("Handling query: " + JSON.stringify(query, ' ', 4))
+    }
+
+    checkContainsChanged() {
+        this.setState({
+            contain: !this.state.contain
+        })
+    }
+
+    fetchData() {
+        console.log("Handling query: " + JSON.stringify(this.query, ' ', 4))
         fetch("http://localhost:3001/biobricks/match", {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(query)
+            body: JSON.stringify(this.query)
         })
             .then(response => response.json())
             .then(responseData => {
                 console.log("Response: " + JSON.stringify(responseData, ' ', 4))
                 this.setState({
                     results: responseData.map(item => ({
-                        title: item.name,
+                        title: item.title,
                         year: item.year,
-                        description: item.description,
-                        wiki: item.wiki,
+                        description: item.content,
+                        wiki: item.url,
                     }))
                 })
             })
     }
 
+    onInputChange(event) {
+        this.setState({
+            search: event.target.value.toString().toLowerCase()
+        })
+        this.fetchData()
+    }
+
     render() {
         const filteredTeams = this.state.search.length > 0 && this.state.results.length > 0 ? this.state.results : this.props.items
+        // console.log(this.state.search.length > 0 && this.state.results.length > 0 ? "res:" + this.state.results : "it:" + this.props.items)
 
         // This function maps TeamItem Component to every search result object
         const bioComponents = filteredTeams.filter(item => item.title !== undefined).map(item => {
@@ -74,20 +90,22 @@ class SearchBarBioBricks extends Component {
             }
         );
 
-        // const biobricks = this.biobricks.map(element => {
-        //     return (
-        //         <div className="selectName">
-        //             <label>
-        //                 {element} :
-        //             </label>
-        //             <input
-        //                 type="checkbox"
-        //                 name={element}
-        //                 checked={true}
-        //             />
-        //         </div>
-        //     )
-        // })
+        const checks = this.tags.map(element => {
+            return (
+                <div className="checkbox-tag">
+                    <label>
+                        {element}
+                    </label>
+                    <input
+                        type="checkbox"
+                        name={element}
+                        defaultChecked={true}
+                        checked={this.state.element}
+                        onChange={this.checkChanged.bind(this)}
+                    />
+                </div>
+            )
+        })
 
         return (
             <div>
@@ -105,13 +123,27 @@ class SearchBarBioBricks extends Component {
                         value={this.state.search}
                         placeholder={"Search for BioBricks ..."}
                         onChange={this.onInputChange.bind(this)}/>
-                    {/*<div>{biobricks}</div>*/}
                     <button
                         className="btn-search"
                         type="submit"
                         onClick={this.handleOnClick}>
                         Search
                     </button>
+                    <div>
+                        <div className="checkbox-tag">
+                            <label>
+                                contains
+                            </label>
+                            <input
+                                type="checkbox"
+                                name="contains"
+                                defaultChecked={true}
+                                checked={this.state.contain}
+                                onChange={this.checkContainsChanged.bind(this)}
+                            />
+                        </div>
+                        {checks}
+                    </div>
                 </form>
                 <div>
                     {bioComponents}
@@ -119,7 +151,6 @@ class SearchBarBioBricks extends Component {
             </div>
         )
     }
-
 }
 
 export default SearchBarBioBricks
