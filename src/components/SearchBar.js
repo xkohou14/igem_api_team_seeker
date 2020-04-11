@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import TeamItem from "./TeamItem";
-import './Sidebar.css';
+import './SearchBar.css';
 
 class SearchBar extends Component {
     constructor(props) {
@@ -8,7 +8,8 @@ class SearchBar extends Component {
         this.state = {
             search: '',
             results: [],
-            biobricks : false
+            biobricks : false,
+            btnName: "BioBricks",
         }
         this.master = this.props.master;
         // this.teams = this.props.team_struture;
@@ -19,6 +20,22 @@ class SearchBar extends Component {
 
     handleOnClick(e) {
         e.preventDefault();
+        console.log("clicked search button " + this.state.search);
+        this.master.clickMaster();
+    }
+
+    handleOnClickBio(e) {
+        e.preventDefault();
+        if (this.state.btnName === "BioBricks") {
+            this.setState({
+                btnName: "Teams"
+            })
+        } else if (this.state.btnName === "Teams") {
+            this.setState({
+                btnName: "BioBricks"
+            })
+        }
+
         console.log("clicked search button " + this.state.search);
         this.master.clickMaster();
     }
@@ -94,14 +111,14 @@ class SearchBar extends Component {
                         className="search"
                         type="text"
                         value={this.state.search}
-                        placeholder="Search for teams..."
+                        placeholder={(() => {if(this.state.btnName === "Teams") return "Search for teams..."; else return "Search for biobricks...";})}
                         onChange={this.onInputChange.bind(this)}/>
                     {/*<div>{checks}</div>*/}
                     <button
                         className="btn-search"
                         type="submit"
-                        onClick={this.handleOnClick}>
-                        BioBricks
+                        onClick={this.handleOnClickBio.bind(this)}>
+                        {this.state.btnName}
                     </button>
                     <button
                         className="btn-search"
