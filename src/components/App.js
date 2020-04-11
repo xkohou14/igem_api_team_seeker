@@ -16,25 +16,19 @@ class App extends Component {
     componentDidMount() {
         this.setState({isLoaded: true})
 
-        fetch("http://localhost:3001/teams/structure")
+        fetch("http://localhost:3001/teams/structure", {})
             .then(response => response.json())
             .then(responseData => {
                 this.setState({
                     isLoaded : true,
                     items: responseData.map(item => ({
-                        title: item.title,
+                        title: item.name,
                         wiki: item.wiki,
                         year: item.year,
                         description: item.abstract,
                     }))
                 })
-
-                // for (let i = 0; i < 11; i++) {
-                //     if (typeof this.state.items[i].title != 'undefined') {
-                //         console.log(this.state.items[i].title.toLowerCase().includes("cell"))
-                //     }
-                // }
-
+                console.log("Response in App: " + JSON.stringify(responseData, ' ', 4))
             })
 
         // fetch("http://localhost:3001/teams/structure")
