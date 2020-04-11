@@ -1,34 +1,50 @@
 import React, {Component} from "react";
 import './App.css'
-import SearchBar from "./SearchBar";
+import SearchBarTeams from "./SearchBarTeams";
+import SearchBarBioBricks from "./SearchBarBioBricks";
 
 class App extends Component {
     constructor(props) {
         super(props)
         this.state = {
             isLoaded: false,
-            items: [],
-            biobricks_structure : [],
-            // teams_structure : []
+            teams : [],
+            biobricks : [],
+            isTeams: true
         }
     }
 
     componentDidMount() {
         this.setState({isLoaded: true})
 
-        fetch("http://localhost:3001/teams/structure", {})
+        fetch("http://localhost:3001/teams", {})
             .then(response => response.json())
             .then(responseData => {
                 this.setState({
                     isLoaded : true,
-                    items: responseData.map(item => ({
-                        title: item.name,
+                    teams: responseData.map(item => ({
+                        title: item.title,
                         wiki: item.wiki,
                         year: item.year,
                         description: item.abstract,
                     }))
                 })
-                console.log("Response in App: " + JSON.stringify(responseData, ' ', 4))
+                console.log("Response in Teams: " + JSON.stringify(responseData, ' ', 4))
+            })
+
+        fetch("http://localhost:3001/biobricks", {})
+            .then(response => response.json())
+            .then(responseData => {
+                this.setState({
+                    isLoaded : true,
+                    biobricks: responseData.map(item => ({
+                        title: item.title,
+                        wiki: item.url,
+                        year: item.year,
+                        description: item.content,
+                    }))
+                })
+                // console.log("Response in bio: " + JSON.stringify(responseData, ' ', 4))
             })
 
         // fetch("http://localhost:3001/teams/structure")
@@ -53,27 +69,26 @@ class App extends Component {
     }
 
     clickMaster() {
-        console.log("Someone clicked me.");
+        this.setState({
+            isTeams: !this.state.isTeams
+        })
     }
 
     render() {
-        if(this.state.isLoaded) {
-            // console.log(this.state.items)
-        }
-
         return (
             // const text = this.state.isLoaded ? "loading..." : null;
+
+            // Here we return searchbar according to isTeams value
             <div className="App">
-                <nav>
-                    <h1 className="App-header">Team Seeker</h1>
-                    <SearchBar
-                        items={this.state.items}
+                    {this.state.isTeams ? <SearchBarTeams
+                        items={this.state.teams}
                         master={this}
-                        // team_structure={this.state.teams_structure}
-                        // biobricks_structure={[]}
-                    />
+                    /> : <SearchBarBioBricks
+                        items={this.state.biobricks}
+                        master={this}
+                    />}
+
                     {/*<p>{text}</p>*/}
-                </nav>
             </div>
         )
     }
