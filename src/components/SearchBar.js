@@ -111,7 +111,7 @@ class SearchBar extends Component {
                         className="search"
                         type="text"
                         value={this.state.search}
-                        placeholder={(() => {if(this.state.btnName === "Teams") return "Search for teams..."; else return "Search for biobricks...";})}
+                        placeholder={"Search for " + this.state.btnName + " ..."}
                         onChange={this.onInputChange.bind(this)}/>
                     {/*<div>{checks}</div>*/}
                     <button
