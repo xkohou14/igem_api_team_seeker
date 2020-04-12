@@ -9,7 +9,7 @@ const randomstring = require('randomstring');
 module.exports = {
     JWT_KEY : 'myPrivateKeyiGemSeeker',
     client : new elasticSearch.Client({
-        host : 'https://elasticsearch.kusik.net',
+        host : process.env.ES_URL || 'https://elasticsearch.kusik.net',
         log: 'trace'
     }),
     mail_transporter : nodemailer.createTransport({

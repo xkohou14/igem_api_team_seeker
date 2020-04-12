@@ -1,0 +1,26 @@
+version: '3.3'
+services:
+    nodeserver:
+        build: .
+        ports:
+            - '9400:3000'
+            - '9401:3001'
+        environment:
+            - ES_URL=http://elasticsearch
+    elasticsearch:
+        image: 'docker.elastic.co/elasticsearch/elasticsearch:7.6.2'
+        # Unpublish these ports to hide elastic search from public
+        ports:
+            - '9200:9200'
+            - '9300:9300'
+        environment:
+            - discovery.type=single-node
+        restart: unless-stopped
+        volumes:
+            - ./elasticdata:/usr/share/elasticsearch/data
+    # For elasticsearch development
+    # elasticvue:
+    #     ports:
+    #         - '9201:8080'
+    #     image: cars10/elasticvue
+    #     restart: unless-stopped
