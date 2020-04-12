@@ -37,7 +37,13 @@
     align-self: center;
 }
 
-.checkbox-tag {
+.radio-tag {
     display: inline-block;
     margin-right: 16px;
 }
+
+.switch-contains {
+    display: inline-block;
+    margin-right: 16px;
+}
+
