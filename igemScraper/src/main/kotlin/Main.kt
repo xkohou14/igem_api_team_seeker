@@ -1,21 +1,14 @@
-import biobricks.BiobrickPart
 import biobricks.BiobricksScraper
-import com.github.kittinunf.fuel.core.await
-import com.github.kittinunf.fuel.core.awaitResponse
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.core.isServerError
-import com.github.kittinunf.fuel.coroutines.awaitString
-import com.github.kittinunf.fuel.coroutines.awaitStringResponse
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
-import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.failure
 import igemteam.IgemTeamScraper
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.*
-import kotlinx.serialization.parse
 import kotlinx.serialization.stringify
 
 lateinit var authToken: String
@@ -65,7 +58,7 @@ fun parseIgemTeams() {
 
     println(teams[0].url)
 
-    val parsedTeams = teams.asSequence().map {
+    val parsedTeams = teams.asSequence().take(100).map {
         IgemTeamScraper.parseTeamPage(it)
     }.forEach {
         val parsedTeamJson = Json(JsonConfiguration.Stable).stringify(it)
@@ -81,20 +74,21 @@ fun parseIgemTeams() {
 
 @OptIn(ImplicitReflectionSerializer::class)
 fun parseBiobricks() {
-    val partsList = BiobricksScraper.parsePartList()
+    BiobricksScraper.partListsUrls.asSequence()
+        .flatMap { BiobricksScraper.parsePartList(it).asSequence() }
+        .take(100)
+        .map {
+            BiobricksScraper.parsePart(it)
+        }.forEach {
+            val parsedBiobrickJson = Json(JsonConfiguration.Stable).stringify(it)
+            println(parsedBiobrickJson)
 
-    partsList.asSequence().map {
-        BiobricksScraper.parsePart(it)
-    }.forEach {
-        val parsedBiobrickJson = Json(JsonConfiguration.Stable).stringify(it)
-        println(parsedBiobrickJson)
-
-        // Send to node
-        "$baseUrl/biobricks".httpPost().authentication().bearer(authToken)
-            .jsonBody(parsedBiobrickJson)
-            .also {
-                println(it)
-            }
-            .response { result -> println(result) }
-    }
+            // Send to node
+            "$baseUrl/biobricks".httpPost().authentication().bearer(authToken)
+                .jsonBody(parsedBiobrickJson)
+                .also {
+                    println(it)
+                }
+                .response { result -> println(result) }
+        }
 }

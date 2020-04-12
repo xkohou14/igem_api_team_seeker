@@ -1,6 +1,7 @@
 package biobricks
 
 import it.skrape.core.fetcher.Mode
+import it.skrape.core.fetcher.Url
 import it.skrape.core.htmlDocument
 import it.skrape.extract
 import it.skrape.selects.eachAttribute
@@ -10,14 +11,24 @@ import it.skrape.skrape
 
 object BiobricksScraper {
 
-    private const val CONSTITUTIVE_URL = "http://parts.igem.org/Promoters/Catalog/Constitutive"
+    val partListsUrls = listOf(
+        "http://parts.igem.org/Promoters/Catalog/Constitutive",
+        "http://parts.igem.org/Promoters/Catalog/Cell_signalling",
+        "http://parts.igem.org/Promoters/Catalog/Metal_sensitive",
+        "http://parts.igem.org/Promoters/Catalog/Phage",
+        "http://parts.igem.org/Promoters/Catalog/Madras",
+        "http://parts.igem.org/Promoters/Catalog/USTC",
+        "http://parts.igem.org/Primers/Catalog"
+    )
+
+//    fun parseAllPartLists() = partLists.flatMap { parsePartList(it) }
 
     /**
      *  Loads and parses the csv with teams provided by iGEM
      */
-    fun parsePartList() = skrape {
+    fun parsePartList(partListUrl: Url) = skrape {
         this.mode = Mode.DOM
-        this.url = CONSTITUTIVE_URL
+        this.url = partListUrl
         this.timeout = 15000
 
         extract {
