@@ -67,14 +67,6 @@ class App extends Component {
                     master={this}
                     selectedTeams={false}
                 />}
-
-                {/*{this.state.isTeams ? <SearchBarTeams*/}
-                {/*    items={this.state.teams}*/}
-                {/*    master={this}*/}
-                {/*/> : <SearchBarBioBricks*/}
-                {/*    items={this.state.biobricks}*/}
-                {/*    master={this}*/}
-                {/*/>}*/}
             </div>
         )
     }
