@@ -8,38 +8,47 @@ class SearchBarTeams extends Component {
         this.state = {
             search: '',
             results: [],
-            title: true,
-            year: true,
-            abstract: true,
+            selectedOption: "abstract",
             contain: true
         }
         this.tags = ["title", "year", "abstract"]
-        this.master = this.props.master;
+        this.master = this.props.master
         this.query = {}
+        this.searchList = {searchList: []};
         this.handleOnClick = this.handleOnClick.bind(this)
         this.fetchData = this.fetchData.bind(this)
-    };
+        this.addToQuery = this.addToQuery.bind(this)
+    }
 
-    handleOnClick(e) {
-        e.preventDefault();
-        // console.log("clicked search button " + this.state.search);
+    handleOnClick(event) {
+        event.preventDefault();
         console.log(this.query)
         this.fetchData()
     }
 
-    handleOnClickBio(e) {
-        e.preventDefault();
+    handleOnClickBio(event) {
+        event.preventDefault();
         this.master.clickMaster();
     }
 
-    checkChanged(event) {
-        if (event.target.checked) {
-            this.query[event.target.name] = [{
-                contain: this.state.contain,
-                value: this.state.search
-            }];
-            console.log(this.query)
-        }
+    addToQuery (tag) {
+        this.query = {}
+        if (tag === "year" && this.state.search.match(/^[A-Za-z]+$/))
+            return
+        this.query[tag] = [{
+            contain: this.state.contain,
+            value: this.state.search
+        }];
+        this.fetchData()
+        // console.log(this.query)
+    }
+
+    async checkChanged(event) {
+        // await new Promise(resolve => this.setState({ selectedOption: event.target.value }, () => resolve()))
+        await this.setState({
+            selectedOption: event.target.value
+        })
+        this.addToQuery (this.state.selectedOption)
     }
 
     checkContainsChanged() {
@@ -72,11 +81,24 @@ class SearchBarTeams extends Component {
             })
     }
 
-    onInputChange(event) {
-        this.setState({
+    async onInputChange(event) {
+        await this.setState({
             search: event.target.value.toString().toLowerCase()
         })
+        this.addToQuery(this.state.selectedOption)
         this.fetchData()
+    }
+
+    handleAddTag(event) {
+        const searchList = this.state.searchList;
+        this.setState({
+            searchList: searchList.concat(<input
+                className="search"
+                type="text"
+                value={this.state.search}
+                placeholder={"Search for teams ..."}
+                onChange={this.onInputChange.bind(this)}/>)
+        });
     }
 
     render() {
@@ -97,10 +119,9 @@ class SearchBarTeams extends Component {
                         {element}
                     </label>
                     <input
-                        type="checkbox"
-                        name={element}
-                        defaultChecked={false}
-                        checked={this.state.element}
+                        type="radio"
+                        value={element}
+                        checked={this.state.selectedOption === element}
                         onChange={this.checkChanged.bind(this)}
                     />
                 </div>
@@ -111,10 +132,16 @@ class SearchBarTeams extends Component {
             <div>
                 <h1 className="App-header">Team Seeker</h1>
                 <button
-                    className="btn-search"
+                    className="btn-switch"
                     type="submit"
                     onClick={this.handleOnClickBio.bind(this)}>
                     BioBricks
+                </button>
+                <button
+                    className="btn-search"
+                    type="submit"
+                    onClick={this.handleOnClick}>
+                    Search
                 </button>
                 <form className="form">
                     <input
@@ -122,27 +149,29 @@ class SearchBarTeams extends Component {
                         type="text"
                         value={this.state.search}
                         placeholder={"Search for teams ..."}
-                        onChange={this.onInputChange.bind(this)}/>
+                        onChange={this.onInputChange.bind(this)}
+                    />
                     <button
                         className="btn-search"
                         type="submit"
-                        onClick={this.handleOnClick}>
-                        Search
+                        onClick={this.handleAddTag.bind(this)}>
+                        add tag
                     </button>
-                    <div className="checkbox-tag">
-                        <label>
-                            contains
-                        </label>
-                        <input
-                            type="checkbox"
-                            name="contains"
-                            defaultChecked={true}
-                            checked={this.state.contain}
-                            onChange={this.checkContainsChanged.bind(this)}
-                        />
-                    </div>
-                    {checks}
+                    {/*{this.searchList.map(input => { return input*/}
+                    {/*})}*/}
                 </form>
+                <div className="checkbox-tag">
+                    <label>
+                        contains
+                    </label>
+                    <input
+                        type="checkbox"
+                        name="contains"
+                        checked={this.state.contain}
+                        onChange={this.checkContainsChanged.bind(this)}
+                    />
+                </div>
+                {checks}
                 <div>
                     {teamComponents}
                 </div>
