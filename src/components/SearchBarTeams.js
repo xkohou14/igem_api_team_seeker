@@ -83,13 +83,13 @@ class SearchBarTeams extends Component {
 
     async onInputChange(event) {
         await this.setState({
-            search: event.target.value.toString().toLowerCase()
+            search: event.target.value
         })
         this.addToQuery(this.state.selectedOption)
         this.fetchData()
     }
 
-    handleAddTag(event) {
+    handleAddTag() {
         const searchList = this.state.searchList;
         this.setState({
             searchList: searchList.concat(<input
