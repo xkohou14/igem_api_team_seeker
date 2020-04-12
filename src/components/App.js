@@ -1,52 +1,53 @@
 import React, {Component} from "react";
 import './App.css'
-import SearchBarTeams from "./SearchBarTeams";
-import SearchBarBioBricks from "./SearchBarBioBricks";
+import SearchBar from "./SearchBar";
 
+// This class renders whole web application
 class App extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            isLoaded: false,
-            teams : [],
-            biobricks : [],
+            teams: [],
+            biobricks: [],
             isTeams: true
         }
     }
 
+    // This function is called only once when the App class renders for the first time
     componentDidMount() {
-        this.setState({isLoaded: true})
-
+        // fetch function sends GET request to API for all team data
         fetch("http://localhost:3001/teams", {})
             .then(response => response.json())
             .then(responseData => {
                 this.setState({
-                    isLoaded : true,
                     teams: responseData.map(item => ({
                         title: item.title,
                         year: item.year,
                         description: item.abstract,
-                        teamId: item.teamId
+                        teamId: item.teamId,
+                        country: item.country,
+                        schoolAddress: item.schoolAddress,
+                        wiki: item.wiki
                     }))
                 })
-                // console.log("Response in Teams: " + JSON.stringify(responseData, ' ', 4))
             })
 
+        // this fetch gets all biobricks data
         fetch("http://localhost:3001/biobricks", {})
             .then(response => response.json())
             .then(responseData => {
                 this.setState({
-                    isLoaded : true,
+                    isLoaded: true,
                     biobricks: responseData.map(item => ({
                         title: item.title,
                         description: item.content,
                         wiki: item.url,
                     }))
                 })
-                // console.log("Response in bio: " + JSON.stringify(responseData, ' ', 4))
             })
     }
 
+    // This function switches between rendering search bar for teams or for biobricks
     clickMaster() {
         this.setState({
             isTeams: !this.state.isTeams
@@ -55,19 +56,25 @@ class App extends Component {
 
     render() {
         return (
-            // const text = this.state.isLoaded ? "loading..." : null;
-
-            // Here we return searchbar according to isTeams value
+            // App class renders particular search bar according to isTeams value
             <div className="App">
-                    {this.state.isTeams ? <SearchBarTeams
-                        items={this.state.teams}
-                        master={this}
-                    /> : <SearchBarBioBricks
-                        items={this.state.biobricks}
-                        master={this}
-                    />}
+                {this.state.isTeams ? <SearchBar
+                    items={this.state.teams}
+                    master={this}
+                    selectedTeams={true}
+                /> : <SearchBar
+                    items={this.state.biobricks}
+                    master={this}
+                    selectedTeams={false}
+                />}
 
-                    {/*<p>{text}</p>*/}
+                {/*{this.state.isTeams ? <SearchBarTeams*/}
+                {/*    items={this.state.teams}*/}
+                {/*    master={this}*/}
+                {/*/> : <SearchBarBioBricks*/}
+                {/*    items={this.state.biobricks}*/}
+                {/*    master={this}*/}
+                {/*/>}*/}
             </div>
         )
     }
