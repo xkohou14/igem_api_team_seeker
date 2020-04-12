@@ -81,7 +81,7 @@ class SearchBarBioBricks extends Component {
 
     async onInputChange(event) {
         await this.setState({
-            search: event.target.value.toString().toLowerCase()
+            search: event.target.value
         })
         this.addToQuery(this.state.selectedOption)
         this.fetchData()
