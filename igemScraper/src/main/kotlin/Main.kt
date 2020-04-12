@@ -19,21 +19,25 @@ import kotlinx.serialization.parse
 import kotlinx.serialization.stringify
 
 lateinit var authToken: String
+lateinit var baseUrl: String
 
 suspend fun main(args: Array<String>) {
     if (args.size < 2) throw IllegalArgumentException("Provide email and password as program arguments")
 
+    // Parse server url from arguments
+    baseUrl = args.getOrElse(2) { "http://localhost:3001" }
+
     login(args[0], args[1])
 
     parseIgemTeams()
-//    parseBiobricks()
+    parseBiobricks()
 }
 
 @OptIn(UnstableDefault::class)
 suspend fun login(email: String, password: String) {
     println("Attempting login...")
 
-    val (request, response, result) = "http://localhost:3001/user/login".httpPost().jsonBody(
+    val (request, response, result) = "$baseUrl/user/login".httpPost().jsonBody(
         """{
             "email": "$email",
             "password": "$password"
@@ -61,14 +65,14 @@ fun parseIgemTeams() {
 
     println(teams[0].url)
 
-    val parsedTeams = teams.asSequence().take(5).map {
+    val parsedTeams = teams.asSequence().map {
         IgemTeamScraper.parseTeamPage(it)
     }.forEach {
         val parsedTeamJson = Json(JsonConfiguration.Stable).stringify(it)
         println(parsedTeamJson)
 
         // Send to node
-        "http://localhost:3001/teams".httpPost().authentication().bearer(authToken)
+        "$baseUrl/teams".httpPost().authentication().bearer(authToken)
             .jsonBody(parsedTeamJson)
             .also { println(it) }
             .response { result -> println(result) }
@@ -79,14 +83,14 @@ fun parseIgemTeams() {
 fun parseBiobricks() {
     val partsList = BiobricksScraper.parsePartList()
 
-    partsList.asSequence().take(5).map {
+    partsList.asSequence().map {
         BiobricksScraper.parsePart(it)
     }.forEach {
         val parsedBiobrickJson = Json(JsonConfiguration.Stable).stringify(it)
         println(parsedBiobrickJson)
 
         // Send to node
-        "http://localhost:3001/biobricks".httpPost().authentication().bearer(authToken)
+        "$baseUrl/biobricks".httpPost().authentication().bearer(authToken)
             .jsonBody(parsedBiobrickJson)
             .also {
                 println(it)
