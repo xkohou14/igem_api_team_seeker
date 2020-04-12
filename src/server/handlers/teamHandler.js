@@ -94,12 +94,13 @@ router.get('/', (request, response, next) => {
     client.search({
         index: indexString,
         scroll: '20s',
+        size : 600,
         body: {
             query: {
                 match_all:{}
             }
         }
-    }, (err, res) => {
+    }, function getAllToTheEnd(err, res) {
         if(err) {
             response.status(codes.NOT_FOUND).json({
                 code : err.status,
@@ -135,6 +136,7 @@ router.get('/structure', (request, response, next) => {
 router.post('/match', (request, response, next) => {
     client.search({
         index: indexString,
+        size : 600,
         scroll: '20s',
         body: {
             query: buildQuery(request.body)
