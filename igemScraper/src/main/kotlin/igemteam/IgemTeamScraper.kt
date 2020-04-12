@@ -51,6 +51,7 @@ object IgemTeamScraper {
                     teamCode = infoRows[1].allElements[2].text
                     division = infoRows[4].allElements[2].text
 
+                    wiki = infoRows[0].findAll("a")[0].attribute("href")
                     schoolAddress = infoRows[2].allElements[2].text
 
                     title = titleAbstractTable.findFirst("td").text
