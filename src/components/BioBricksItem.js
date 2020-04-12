@@ -1,7 +1,7 @@
 import React from "react";
 import './TeamItem.css'
 
-// Component for displaying one team card in the main page
+// Component for displaying one biobrick item in the main page
 function BioBricksItem(props) {
     return (
         <div className="team-item">
