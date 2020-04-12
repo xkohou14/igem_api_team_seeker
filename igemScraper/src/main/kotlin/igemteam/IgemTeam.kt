@@ -35,6 +35,7 @@ open class IgemTeam {
     var teamCode: String? = null
     var division: String? = null
 
+    var wiki: String? = null
     var schoolAddress: String? = null
 
     var title: String? = null
