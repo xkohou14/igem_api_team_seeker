@@ -72,7 +72,6 @@ class SearchBar extends Component {
         }];
         // after constructing a query we send a request to API
         this.fetchData()
-        // console.log(this.query)
     }
 
     // This function sets new state of radio button and adds new property to query
@@ -102,7 +101,6 @@ class SearchBar extends Component {
     // This function build and send POST request to API with created query
     fetchData() {
         const input = this.state.isTeams ? "teams" : "biobricks"
-        // console.log("Handling query: " + JSON.stringify(this.query, ' ', 4))
         fetch("http://localhost:3001/" + input + "/match", {
             method: "POST",
             headers: {
@@ -113,7 +111,6 @@ class SearchBar extends Component {
         })
             .then(response => response.json())
             .then(responseData => {
-                // console.log("Response: " + JSON.stringify(responseData, ' ', 4))
                 this.setState(this.state.isTeams ? {
                         results: responseData.map(item => ({
                             title: item.title,
