@@ -120,7 +120,7 @@ Use `localhost:3001/user` for it
 - `localhost:3001/users/signup` - to create an account
 - `localhost:3001/users/login` - to log in
 
-See examples to create account.
+See examples to create account. You should receive an e-mail after creation.
 ```
 POST: localhost:3001/user/signup
 {
