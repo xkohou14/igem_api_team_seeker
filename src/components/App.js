@@ -16,7 +16,7 @@ class App extends Component {
     // This function is called only once when the App class renders for the first time
     componentDidMount() {
         // fetch function sends GET request to API for all team data
-        fetch("http://localhost:3001/teams", {})
+        fetch("https://backend.igemseeker.kusik.net" + "/teams", {})
             .then(response => response.json())
             .then(responseData => {
                 this.setState({
@@ -33,7 +33,7 @@ class App extends Component {
             })
 
         // this fetch gets all biobricks data
-        fetch("http://localhost:3001/biobricks", {})
+        fetch("https://backend.igemseeker.kusik.net" + "/biobricks", {})
             .then(response => response.json())
             .then(responseData => {
                 this.setState({

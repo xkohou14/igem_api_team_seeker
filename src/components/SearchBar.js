@@ -101,7 +101,7 @@ class SearchBar extends Component {
     // This function build and send POST request to API with created query
     fetchData() {
         const input = this.state.isTeams ? "teams" : "biobricks"
-        fetch("http://localhost:3001/" + input + "/match", {
+        fetch("https://backend.igemseeker.kusik.net/" + input + "/match", {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
