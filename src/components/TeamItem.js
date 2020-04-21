@@ -14,10 +14,10 @@ function TeamItem(props) {
             </h2>
             <h2 className="team-item-header">
                 <span className="span-name">{"School: "}</span>
+                {console.log(props.item.schoolAddress)}
                 {props.item.schoolAddress !== undefined
-                && (props.item.schoolAddress.includes(",")
-                ? props.item.schoolAddress.substring(0, props.item.schoolAddress.indexOf(","))
-                : props.item.schoolAddress.substring(0, props.item.schoolAddress.indexOf("http")))}
+                && schoolFormat(props.item.schoolAddress)
+                }
             </h2>
             <p className="team-item-descr">{props.item.description}</p>
             <p className="team-item-wiki">{"More info: "}
@@ -39,6 +39,16 @@ function TeamItem(props) {
             <hr/>
         </div>
     )
+}
+
+function schoolFormat(schoolAddress) {
+    if(schoolAddress.includes(",")) {
+        return schoolAddress.substring(0, schoolAddress.indexOf(","))
+    } else if (schoolAddress.includes("http")) {
+        return schoolAddress.substring(0, schoolAddress.indexOf("http"))
+    } else {
+        return schoolAddress
+    }
 }
 
 export default TeamItem
