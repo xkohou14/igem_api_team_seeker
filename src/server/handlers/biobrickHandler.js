@@ -116,6 +116,7 @@ function checkStructure (object, stopWith) {
 router.get('/', (request, response, next) => {
     client.search({
         index: indexString,
+        size : 600,
         scroll: '20s',
         body: {
             query: {
@@ -154,6 +155,7 @@ router.get('/', (request, response, next) => {
 router.post('/match', (request, response, next) => {
     client.search({
         index: indexString,
+        size : 600,
         scroll: '20s',
         body: {
             query: buildQuery(request.body)
