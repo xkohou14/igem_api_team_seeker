@@ -134,17 +134,31 @@ class SearchBar extends Component {
     }
 
     render() {
-        // If there are no search results return default list of all items
-        const itemList = this.state.search.length > 0 && this.state.results.length > 0 ? this.state.results : this.props.items
 
-        // This function maps item Component to every search result object
-        const itemComponents = itemList.filter(item => item.title !== undefined).map(item => {
-                return (this.state.isTeams ?
-                        <TeamItem key={item.id} item={item}/> :
-                        <BioBricksItem key={item.id} item={item}/>
-                )
-            }
-        );
+        var itemList
+
+        // If there are no search results return default list of all items
+        if (this.state.search.length > 0 && this.state.results.length > 0) {
+            itemList = this.state.results
+        } else if (this.state.search.length > 0 && this.state.results.length === 0) {
+
+        } else {
+            itemList = this.props.items
+        }
+        // itemList = this.state.search.length > 0 && this.state.results.length > 0 ? this.state.results : this.props.items
+
+        var itemComponents
+
+        if (itemList) {
+            // This function maps item Component to every search result object
+            itemComponents = itemList.filter(item => item.title !== undefined).map(item => {
+                    return (this.state.isTeams ?
+                            <TeamItem key={item.id} item={item}/> :
+                            <BioBricksItem key={item.id} item={item}/>
+                    )
+                }
+            );
+        }
 
         // Here is every item from "tags" maps on radio buttons and binded with their functionality
         const tags = this.state.isTeams ? this.tagsTeams : this.tagsBio
