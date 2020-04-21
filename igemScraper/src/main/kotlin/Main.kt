@@ -10,11 +10,17 @@ import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.*
 import kotlinx.serialization.stringify
+import kotlin.system.exitProcess
 
 lateinit var authToken: String
 lateinit var baseUrl: String
 
 suspend fun main(args: Array<String>) {
+    if (args.getOrNull(0) == "help"){
+        println("Usage: igemScraper email password [backend server url]")
+        exitProcess(0)
+    }
+
     if (args.size < 2) throw IllegalArgumentException("Provide email and password as program arguments")
 
     // Parse server url from arguments
