@@ -8,6 +8,7 @@ const codes = require('../server_codes');
 const buildQuery = require('./query_builder');
 const shared = require('./shared');
 const checkAuth = require('./auth_checker');
+const fileHandler = require('./file_handler');
 
 let client = shared.client;
 let indexString = "team";
@@ -38,8 +39,9 @@ let structure = ["teamId",
  * @param teamCode of team
  * @param exists action to do if it's exists
  * @param nonExist action to do if it doesn't exist
+ * @param noDBConnection action, when DB connection is not established
  */
-function teamExists (teamCode, exists, nonExist) {
+function teamExists (teamCode, exists, nonExist, noDBConnection) {
     client.search({
         index: indexString,
         scroll: '1s',
@@ -56,7 +58,8 @@ function teamExists (teamCode, exists, nonExist) {
         }
     }, (err, res) => {
         if(err) {
-            nonExist();
+            noDBConnection();
+            /*nonExist();*/
         } else {
             let allHits = [];
             res.hits.hits.forEach((hit) => {
@@ -91,42 +94,48 @@ function checkStructure(object) {
 }
 
 router.get('/', (request, response, next) => {
-    client.search({
-        index: indexString,
-        scroll: '20s',
-        size : 600,
-        body: {
-            query: {
-                match_all:{}
+    if (fileHandler.storageExists()) {
+        response.status(codes.OK).json(
+            fileHandler.getTeams()
+        )
+    } else {
+        client.search({
+            index: indexString,
+            scroll: '20s',
+            size : 600,
+            body: {
+                query: {
+                    match_all:{}
+                }
             }
-        }
-    }, function getAllToTheEnd(err, res) {
-        if(err) {
-            response.status(codes.NOT_FOUND).json({
-                code : err.status,
-                message : err.message,
-            });
-        } else {
-            let allHits = [];
-            res.hits.hits.forEach(function (hit) {
-                allHits.push({
-                    id: hit._id,
-                    ...hit._source
+        }, function getAllToTheEnd(err, res) {
+            if(err) {
+                response.status(codes.NOT_FOUND).json({
+                    code : err.status,
+                    message : err.message,
                 });
-            });
-
-            if (res.hits.total !== allHits.length) {
-                client.scroll({
-                    scrollId: res._scroll_id,
-                    scroll: '10s'
-                }, () => {console.log("There are more results")});
             } else {
-                console.log('all done', allHits);
-            }
+                let allHits = [];
+                res.hits.hits.forEach(function (hit) {
+                    allHits.push({
+                        id: hit._id,
+                        ...hit._source
+                    });
+                });
 
-            response.status(codes.OK).json(allHits);
-        }
-    });
+                if (res.hits.total !== allHits.length) {
+                    client.scroll({
+                        scrollId: res._scroll_id,
+                        scroll: '10s'
+                    }, () => {console.log("There are more results")});
+                } else {
+                    console.log('all done', allHits);
+                }
+
+                response.status(codes.OK).json(allHits);
+            }
+        });
+    }
 });
 
 router.get('/structure', (request, response, next) => {
@@ -134,43 +143,67 @@ router.get('/structure', (request, response, next) => {
 });
 
 router.post('/match', (request, response, next) => {
-    client.search({
-        index: indexString,
-        size : 600,
-        scroll: '20s',
-        body: {
-            query: buildQuery(request.body)
-        }
-    }, (err, res) => {
-        if(err) {
-            response.status(codes.NOT_FOUND).json({
-                code : err.status,
-                message : err.message,
-            });
-        } else {
-            let allHits = [];
-            res.hits.hits.forEach(function (hit) {
-                allHits.push({
-                    id: hit._id,
-                    ...hit._source
-                });
-            });
-
-            if (res.hits.total !== allHits.length) {
-                client.scroll({
-                    scrollId: res._scroll_id,
-                    scroll: '10s'
-                }, () => {console.log("There ara more results")});
-            } else {
-                console.log('all done', allHits);
+    if (fileHandler.storageExists()) {
+        response.status(codes.OK_HANDLES_FILE).json(
+            fileHandler.matchTeams(request.body)
+        );
+    } else {
+        client.search({
+            index: indexString,
+            size : 600,
+            scroll: '20s',
+            body: {
+                query: buildQuery(request.body)
             }
+        }, (err, res) => {
+            if(err) {
+                response.status(codes.NOT_FOUND).json({
+                    code : err.status,
+                    message : err.message,
+                });
+            } else {
+                let allHits = [];
+                res.hits.hits.forEach(function (hit) {
+                    allHits.push({
+                        id: hit._id,
+                        ...hit._source
+                    });
+                });
 
-            response.status(codes.OK).json(allHits);
-        }
+                if (res.hits.total !== allHits.length) {
+                    client.scroll({
+                        scrollId: res._scroll_id,
+                        scroll: '10s'
+                    }, () => {console.log("There ara more results")});
+                } else {
+                    console.log('all done', allHits);
+                }
+
+                response.status(codes.OK).json(allHits);
+            }
+        });
+    }
+});
+
+router.post('/file', (request, response, next) => {
+    fileHandler.addTeam(request.body);
+    response.status(codes.OK_HANDLES_FILE).json({
+        message : "Object created",
+        code : codes.CREATED,
+        object : request.body
     });
 });
 
-router.post('/', checkAuth, (request, response, next) => {
+router.post('/copy_file', (request, response, next) => {
+    fileHandler.copyToReact();
+    response.status(codes.OK_HANDLES_FILE).json({
+        message : "File copied",
+        code : codes.CREATED,
+        object : request.body
+    });
+});
+
+router.post('/'/*, checkAuth*/, (request, response, next) => {
     if(!checkStructure(request.body)) {
         return response.status(codes.SERVER_ERROR).json({
             code : codes.SERVER_ERROR,
@@ -203,7 +236,16 @@ router.post('/', checkAuth, (request, response, next) => {
         })
     };
 
-    teamExists(request.body.teamCode, exist, nonExist);
+    const noDBConnection = () => {
+        fileHandler.addTeam(request.body);
+        response.status(codes.OK_HANDLES_FILE).json({
+            message : "Object created",
+            code : codes.CREATED,
+            object : request.body
+        });
+    };
+
+    teamExists(request.body.teamCode, exist, nonExist, noDBConnection);
 });
 
 router.delete('/:teamCode', checkAuth, (request, response, next) => {

@@ -1,11 +1,12 @@
 import React, {Component} from "react";
 import './App.css'
 import SearchBar from "./SearchBar";
+import data from "../igem_data"
 
 // This class renders whole web application
 class App extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             teams: [],
             biobricks: [],
@@ -13,6 +14,27 @@ class App extends Component {
         }
     }
 
+    isEmpty(obj) {
+        for(let property in obj) {
+            if(obj.hasOwnProperty(property)) {
+                return false;
+            }
+        }
+
+        return JSON.stringify(obj) === JSON.stringify({});
+    }
+
+    handleResultsOfAPI(response) {
+        console.log(response);
+        const data = response.json();
+        console.log(data.status);
+        if (data.status === 404 || this.isEmpty(data)) {
+            console.log("Empty object");
+            return []
+        } else {
+            return data;
+        }
+    }
     // This function is called only once when the App class renders for the first time
     componentDidMount() {
         // fetch function sends GET request to API for all team data

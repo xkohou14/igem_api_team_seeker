@@ -162,9 +162,9 @@ class SearchBar extends Component {
 
         // Here is every item from "tags" maps on radio buttons and binded with their functionality
         const tags = this.state.isTeams ? this.tagsTeams : this.tagsBio
-        const checks = tags.map(element => {
+        const checks = tags.map((element, index) => {
             return (
-                <div className="radio-tag" >
+                <div key={index} className="radio-tag" >
                     <label >
                         {element}
                     </label>

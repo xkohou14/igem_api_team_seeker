@@ -14,10 +14,11 @@ import kotlin.system.exitProcess
 
 lateinit var authToken: String
 lateinit var baseUrl: String
+lateinit var fileStorage: String
 
 suspend fun main(args: Array<String>) {
     if (args.getOrNull(0) == "help"){
-        println("Usage: igemScraper email password [backend server url]")
+        println("Usage: igemScraper email password [backend server url] [save to file instead of DB (write 'file')]")
         exitProcess(0)
     }
 
@@ -26,10 +27,18 @@ suspend fun main(args: Array<String>) {
     // Parse server url from arguments
     baseUrl = args.getOrElse(2) { "http://localhost:3001" }
 
-    login(args[0], args[1])
+    // Parse to save to file or to db
+    var fileStorring: String = args.getOrElse(3) { "" }
+    if (fileStorring.length != 0) {fileStorage = "/" + fileStorring} else {fileStorage = ""}
+
+    //login(args[0], args[1])
 
     parseIgemTeams()
     parseBiobricks()
+
+    "$baseUrl/teams/copy_file".httpPost()
+            .jsonBody("{}")
+            .response { result -> println(result) }
 }
 
 @OptIn(UnstableDefault::class)
@@ -60,18 +69,18 @@ suspend fun login(email: String, password: String) {
 @OptIn(ImplicitReflectionSerializer::class)
 fun parseIgemTeams() {
     val teams = IgemTeamScraper.loadTeamList()
-    println(teams)
+    println(teams.size)
 
     println(teams[0].url)
 
-    val parsedTeams = teams.asSequence().take(100).map {
+    val parsedTeams = teams.asSequence().take(teams.size).map {
         IgemTeamScraper.parseTeamPage(it)
     }.forEach {
         val parsedTeamJson = Json(JsonConfiguration.Stable).stringify(it)
         println(parsedTeamJson)
 
         // Send to node
-        "$baseUrl/teams".httpPost().authentication().bearer(authToken)
+        "$baseUrl/teams$fileStorage".httpPost()/*.authentication().bearer(authToken)*/
             .jsonBody(parsedTeamJson)
             .also { println(it) }
             .response { result -> println(result) }
@@ -82,7 +91,7 @@ fun parseIgemTeams() {
 fun parseBiobricks() {
     BiobricksScraper.partListsUrls.asSequence()
         .flatMap { BiobricksScraper.parsePartList(it).asSequence() }
-        .take(100)
+        /*.take(100)*/
         .map {
             BiobricksScraper.parsePart(it)
         }.forEach {
@@ -90,11 +99,12 @@ fun parseBiobricks() {
             println(parsedBiobrickJson)
 
             // Send to node
-            "$baseUrl/biobricks".httpPost().authentication().bearer(authToken)
+            "$baseUrl/biobricks$fileStorage".httpPost()/*.authentication().bearer(authToken)*/
                 .jsonBody(parsedBiobrickJson)
                 .also {
                     println(it)
                 }
                 .response { result -> println(result) }
         }
+    println(BiobricksScraper.partListsUrls.size)
 }

@@ -8,6 +8,7 @@ const codes = require('../server_codes');
 const buildQuery = require('./query_builder');
 const shared = require('./shared');
 const checkAuth = require('./auth_checker');
+const fileHandler = require('./file_handler');
 
 let client = shared.client;
 let indexString = "biobricks";
@@ -114,79 +115,91 @@ function checkStructure (object, stopWith) {
 }
 
 router.get('/', (request, response, next) => {
-    client.search({
-        index: indexString,
-        size : 600,
-        scroll: '20s',
-        body: {
-            query: {
-                match_all:{}
+    if (fileHandler.storageExists()) {
+        response.status(codes.OK).json(
+            fileHandler.getBiobricks()
+        )
+    } else {
+        client.search({
+            index: indexString,
+            size : 600,
+            scroll: '20s',
+            body: {
+                query: {
+                    match_all:{}
+                }
             }
-        }
-    }, (err, res) => {
-        if(err) {
-            response.status(codes.NOT_FOUND).json({
-                code : err.status,
-                message : err.message,
-            });
-        } else {
-            let allHits = [];
-            res.hits.hits.forEach(function (hit) {
-                allHits.push({
-                    id: hit._id,
-                    ...hit._source
+        }, (err, res) => {
+            if(err) {
+                response.status(codes.NOT_FOUND).json({
+                    code : err.status,
+                    message : err.message,
                 });
-            });
-
-            if (res.hits.total !== allHits.length) {
-                client.scroll({
-                    scrollId: res._scroll_id,
-                    scroll: '10s'
-                }, () => {console.log("There are more results")});
             } else {
-                console.log('all done', allHits);
-            }
+                let allHits = [];
+                res.hits.hits.forEach(function (hit) {
+                    allHits.push({
+                        id: hit._id,
+                        ...hit._source
+                    });
+                });
 
-            response.status(codes.OK).json(allHits);
-        }
-    });
+                if (res.hits.total !== allHits.length) {
+                    client.scroll({
+                        scrollId: res._scroll_id,
+                        scroll: '10s'
+                    }, () => {console.log("There are more results")});
+                } else {
+                    console.log('all done', allHits);
+                }
+
+                response.status(codes.OK).json(allHits);
+            }
+        });
+    }
 });
 
 router.post('/match', (request, response, next) => {
-    client.search({
-        index: indexString,
-        size : 600,
-        scroll: '20s',
-        body: {
-            query: buildQuery(request.body)
-        }
-    }, (err, res) => {
-        if(err) {
-            response.status(codes.NOT_FOUND).json({
-                code : err.status,
-                message : err.message,
-            });
-        } else {
-            let allHits = [];
-            res.hits.hits.forEach(function (hit) {
-                allHits.push({
-                    id: hit._id,
-                    ...hit._source
-                });
-            });
-
-            if (res.hits.total !== allHits.length) {
-                client.scroll({
-                    scrollId: res._scroll_id,
-                    scroll: '10s'
-                }, () => {console.log("There ara more results")});
-            } else {
-                console.log('all done', allHits);
+    if (fileHandler.storageExists()) {
+        response.status(codes.OK_HANDLES_FILE).json(
+            fileHandler.matchBiobricks(request.body)
+        );
+    } else {
+        client.search({
+            index: indexString,
+            size : 600,
+            scroll: '20s',
+            body: {
+                query: buildQuery(request.body)
             }
+        }, (err, res) => {
+            if(err) {
+                response.status(codes.NOT_FOUND).json({
+                    code : err.status,
+                    message : err.message,
+                });
+            } else {
+                let allHits = [];
+                res.hits.hits.forEach(function (hit) {
+                    allHits.push({
+                        id: hit._id,
+                        ...hit._source
+                    });
+                });
 
-            response.status(codes.OK).json(allHits);
-        }
-    });
+                if (res.hits.total !== allHits.length) {
+                    client.scroll({
+                        scrollId: res._scroll_id,
+                        scroll: '10s'
+                    }, () => {console.log("There ara more results")});
+                } else {
+                    console.log('all done', allHits);
+                }
+
+                response.status(codes.OK).json(allHits);
+            }
+        });
+    }
 });
 
 
@@ -203,7 +216,16 @@ router.get('/structure', (request, response, next) => {
     });
 });
 
-router.post('/', checkAuth, (request, response, next) => {
+router.post('/file', (request, response, next) => {
+    fileHandler.addBiobricks(request.body);
+    response.status(codes.OK_HANDLES_FILE).json({
+        message : "Object created",
+        code : codes.CREATED,
+        object : request.body
+    });
+});
+
+router.post('/'/*, checkAuth*/, (request, response, next) => {
     if(!containsAttribute(request.body,"title")) {
         return response.status(codes.SERVER_ERROR).json({
             code : codes.SERVER_ERROR,
