@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/my-igem_api_team_seeker/static/css/main.581217f2.chunk.css",
-    "main.js": "/my-igem_api_team_seeker/static/js/main.419b2254.chunk.js",
-    "main.js.map": "/my-igem_api_team_seeker/static/js/main.419b2254.chunk.js.map",
-    "runtime-main.js": "/my-igem_api_team_seeker/static/js/runtime-main.5006e18a.js",
-    "runtime-main.js.map": "/my-igem_api_team_seeker/static/js/runtime-main.5006e18a.js.map",
-    "static/js/2.7aa98b47.chunk.js": "/my-igem_api_team_seeker/static/js/2.7aa98b47.chunk.js",
-    "static/js/2.7aa98b47.chunk.js.map": "/my-igem_api_team_seeker/static/js/2.7aa98b47.chunk.js.map",
-    "index.html": "/my-igem_api_team_seeker/index.html",
-    "precache-manifest.e4cdb9f7a81b4ee57671b0d5a90d524b.js": "/my-igem_api_team_seeker/precache-manifest.e4cdb9f7a81b4ee57671b0d5a90d524b.js",
-    "service-worker.js": "/my-igem_api_team_seeker/service-worker.js",
-    "static/css/main.581217f2.chunk.css.map": "/my-igem_api_team_seeker/static/css/main.581217f2.chunk.css.map",
-    "static/js/2.7aa98b47.chunk.js.LICENSE.txt": "/my-igem_api_team_seeker/static/js/2.7aa98b47.chunk.js.LICENSE.txt"
+    "main.css": "/igem_api_team_seeker/static/css/main.581217f2.chunk.css",
+    "main.js": "/igem_api_team_seeker/static/js/main.5b072360.chunk.js",
+    "main.js.map": "/igem_api_team_seeker/static/js/main.5b072360.chunk.js.map",
+    "runtime-main.js": "/igem_api_team_seeker/static/js/runtime-main.19a2f367.js",
+    "runtime-main.js.map": "/igem_api_team_seeker/static/js/runtime-main.19a2f367.js.map",
+    "static/js/2.7aa98b47.chunk.js": "/igem_api_team_seeker/static/js/2.7aa98b47.chunk.js",
+    "static/js/2.7aa98b47.chunk.js.map": "/igem_api_team_seeker/static/js/2.7aa98b47.chunk.js.map",
+    "index.html": "/igem_api_team_seeker/index.html",
+    "precache-manifest.b99a4fd76bc810859944c4fad433e661.js": "/igem_api_team_seeker/precache-manifest.b99a4fd76bc810859944c4fad433e661.js",
+    "service-worker.js": "/igem_api_team_seeker/service-worker.js",
+    "static/css/main.581217f2.chunk.css.map": "/igem_api_team_seeker/static/css/main.581217f2.chunk.css.map",
+    "static/js/2.7aa98b47.chunk.js.LICENSE.txt": "/igem_api_team_seeker/static/js/2.7aa98b47.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.5006e18a.js",
+    "static/js/runtime-main.19a2f367.js",
     "static/js/2.7aa98b47.chunk.js",
     "static/css/main.581217f2.chunk.css",
-    "static/js/main.419b2254.chunk.js"
+    "static/js/main.5b072360.chunk.js"
   ]
 }
